@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/scenes/screens/account_parameters.dart';
+import 'package:mobile_app/scenes/screens/home.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
@@ -13,12 +14,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final ValueNotifier<Widget> _currentScreen = ValueNotifier<Widget>(Container());
+  final ValueNotifier<Widget> _currentScreen = ValueNotifier<Widget>(const Home());
 
   void _selectScreen(int index) {
     switch (index) {
       case 0:
-        _currentScreen.value = Container();
+        _currentScreen.value = const Home();
         break;
       case 1:
         _currentScreen.value = Container();
@@ -46,7 +47,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: ValueListenableBuilder<Widget>(
         valueListenable: _currentScreen,
         builder: (BuildContext context, Widget value, Widget? child) {

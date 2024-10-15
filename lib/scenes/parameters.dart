@@ -12,7 +12,10 @@ class Parameters extends StatefulWidget {
 class _ParametersState extends State<Parameters> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Parameters'),
+      ),
       body: Center(
         child: Text('Hello, World!'),
       ),

@@ -22,9 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Text('Hello, World!'),
-      ),
+      body: Container(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type : BottomNavigationBarType.fixed,

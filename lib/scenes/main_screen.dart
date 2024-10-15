@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/scenes/screens/account_parameters.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
@@ -12,7 +13,31 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
+  final ValueNotifier<Widget> _currentScreen = ValueNotifier<Widget>(Container());
+
+  void _selectScreen(int index) {
+    switch (index) {
+      case 0:
+        _currentScreen.value = Container();
+        break;
+      case 1:
+        _currentScreen.value = Container();
+        break;
+      case 2:
+        _currentScreen.value = Container();
+        break;
+      case 3:
+        _currentScreen.value = Container();
+        break;
+      case 4:
+        _currentScreen.value = const AccountParameters();
+        break;
+    }
+  }
+
   void _onItemTapped(int index) {
+    _selectScreen(index);
+
     setState(() {
       _selectedIndex = index;
     });
@@ -22,7 +47,12 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Container(),
+      body: ValueListenableBuilder<Widget>(
+        valueListenable: _currentScreen,
+        builder: (BuildContext context, Widget value, Widget? child) {
+          return value;
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type : BottomNavigationBarType.fixed,

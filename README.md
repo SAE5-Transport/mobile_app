@@ -1,16 +1,30 @@
 # mobile_app
 
-A new Flutter project.
+This is the repository of mobile app for HexaTransit project
 
-## Getting Started
+## About
 
-This project is a starting point for a Flutter application.
+### Features
 
-A few resources to get you started if this is your first Flutter project:
+## Installation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Requirement
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- OpenJDK 21
+- Flutter 3.24.4
+
+### Launch
+
+- clone the repo
+```sh
+git clone https://github.com/SAE5-Transport/mobile_app.git
+cd mobile_app
+```
+
+- TODO
+
+## Docs
+
+see the [documentation repository](https://github.com/SAE5-Transport/Documentation)
+
+## License

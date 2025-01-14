@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/scenes/screens/account_parameters.dart';
-import 'package:mobile_app/scenes/screens/home.dart';
+import 'package:mobile_app/scenes/navbar_screens/account_parameters.dart';
+import 'package:mobile_app/scenes/navbar_screens/home.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
@@ -13,6 +13,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  final List<Map<String, dynamic>> _favorites = [];
 
   final ValueNotifier<Widget> _currentScreen = ValueNotifier<Widget>(const Home());
 

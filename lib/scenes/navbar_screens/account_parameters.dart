@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/states/connect_state.dart' as app_state;
 
 class AccountParameters extends StatefulWidget {
   const AccountParameters({
@@ -12,12 +13,15 @@ class AccountParameters extends StatefulWidget {
 class _AccountParametersState extends State<AccountParameters> {
   @override
   Widget build(BuildContext context) {
+    String? username = app_state.cachedAuthedUser.of(context)?.userInfo['name'];
+    String? email = app_state.cachedAuthedUser.of(context)?.userInfo['email'];
+
     return Column(
       children: [
         Container(
           height: 120,
           alignment: Alignment.center,
-          child: const Row(
+          child: Row(
             children: [
               const SizedBox(width: 10),
 
@@ -29,8 +33,8 @@ class _AccountParametersState extends State<AccountParameters> {
               const SizedBox(width: 5),
 
               Text(
-                'Bonjour {username} !',
-                style: TextStyle(
+                "Bonjour ${username!} !",
+                style: const TextStyle(
                   fontSize: 24,
                 ),
               ),

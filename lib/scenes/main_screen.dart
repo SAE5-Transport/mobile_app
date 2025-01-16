@@ -13,7 +13,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  final List<Map<String, dynamic>> _favorites = [];
 
   final ValueNotifier<Widget> _currentScreen = ValueNotifier<Widget>(const Home());
 

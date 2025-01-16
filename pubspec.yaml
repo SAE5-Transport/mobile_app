@@ -44,6 +44,9 @@ dependencies:
   oidc_default_store: ^0.2.0+12
   bdaya_shared_value: ^3.1.3
   go_router: ^14.6.3
+  package_info_plus: ^8.1.3
+  async: ^2.11.0
+  logging: ^1.3.0
 
 dev_dependencies:
   flutter_test:

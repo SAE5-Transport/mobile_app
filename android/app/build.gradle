@@ -59,7 +59,7 @@ android {
         versionName = flutterVersionName
 
         manifestPlaceholders += [
-            appAuthRedirectScheme: 'com.redirectScheme.comm'
+            appAuthRedirectScheme: 'com.uwucorp.hexatransit'
         ]
     }
 

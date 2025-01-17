@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_app/states/connect_state.dart' as app_state;
 
 class AccountParameters extends StatefulWidget {
   const AccountParameters({
-    Key? key,
+    super.key
   });
 
   @override
@@ -34,9 +35,11 @@ class _AccountParametersState extends State<AccountParameters> {
 
               Text(
                 "Bonjour ${username!} !",
-                style: const TextStyle(
-                  fontSize: 24,
-                ),
+                style: GoogleFonts.nunito(
+                  textStyle: const TextStyle(
+                    fontSize: 24,
+                  )
+                )
               ),
             ],
           )

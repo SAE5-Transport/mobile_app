@@ -4,7 +4,7 @@ import 'package:mobile_app/scenes/navbar_screens/home.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
-    Key? key,
+    super.key,
   });
 
   @override

@@ -10,7 +10,7 @@ class DarkThemeData {
         backgroundColor: Color(0xFF88D795),
         foregroundColor: Colors.white,
       ),
-      scaffoldBackgroundColor: Color.fromARGB(255, 65, 65, 65),
+      scaffoldBackgroundColor: const Color.fromARGB(255, 65, 65, 65),
       useMaterial3: true,
     );
   }

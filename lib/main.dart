@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:mobile_app/scenes/login_screen.dart';
-import 'package:mobile_app/assets/themes/mainThemeData.dart';
+import 'package:mobile_app/assets/themes/main__theme_data.dart';
 import 'package:mobile_app/hive/functions.dart';
 import 'package:mobile_app/scenes/main_screen.dart';
 import 'package:mobile_app/states/connect_state.dart' as app_state;

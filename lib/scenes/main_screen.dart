@@ -47,16 +47,22 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ValueListenableBuilder<Widget>(
-        valueListenable: _currentScreen,
-        builder: (BuildContext context, Widget value, Widget? child) {
-          return value;
-        },
+      body: SafeArea(
+        child: ValueListenableBuilder<Widget>(
+          valueListenable: _currentScreen,
+          builder: (BuildContext context, Widget value, Widget? child) {
+            return value;
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type : BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
+        backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+        selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
+        unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
+        selectedLabelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(inherit: true),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

@@ -206,19 +206,35 @@ class _RoutePageState extends State<RoutePage> {
                   ],
                 ),
 
-                // Swap button
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Swap the start and end text boxes
-                      String temp = startController.text;
-                      startController.text = endController.text;
-                      endController.text = temp;
-                    },
-                    child: const Icon(Icons.swap_vert),
-                  ),
-                ),
+                
+                Column(
+                  children: [
+                    // Swap button
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Swap the start and end text boxes
+                          String temp = startController.text;
+                          startController.text = endController.text;
+                          endController.text = temp;
+                        },
+                        child: const Icon(Icons.swap_vert),
+                      ),
+                    ),
+
+                    // Search button
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Search for the route
+                        },
+                        child: const Icon(Icons.search),
+                      ),
+                    ),
+                  ],
+                )
               ],
             )
           ),

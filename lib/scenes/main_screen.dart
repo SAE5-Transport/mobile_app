@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/scenes/navbar_screens/account_parameters.dart';
 import 'package:mobile_app/scenes/navbar_screens/home.dart';
+import 'package:mobile_app/scenes/navbar_screens/route.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
@@ -22,7 +23,7 @@ class _MainScreenState extends State<MainScreen> {
         _currentScreen.value = const Home();
         break;
       case 1:
-        _currentScreen.value = Container();
+        _currentScreen.value = const RoutePage();
         break;
       case 2:
         _currentScreen.value = Container();
@@ -47,11 +48,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ValueListenableBuilder<Widget>(
-        valueListenable: _currentScreen,
-        builder: (BuildContext context, Widget value, Widget? child) {
-          return value;
-        },
+      body: SafeArea(
+        child: ValueListenableBuilder<Widget>(
+          valueListenable: _currentScreen,
+          builder: (BuildContext context, Widget value, Widget? child) {
+            return value;
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

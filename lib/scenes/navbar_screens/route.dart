@@ -18,6 +18,7 @@ class _RoutePageState extends State<RoutePage> {
     TextEditingController endController = TextEditingController();
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Buttons to switch between "Favoris / Prévu" and "Historique"
         Row(

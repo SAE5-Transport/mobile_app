@@ -1,6 +1,5 @@
 import 'package:bdaya_shared_value/bdaya_shared_value.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:mobile_app/scenes/login_screen.dart';
@@ -21,30 +20,27 @@ void main() {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  runApp(
-    SharedValue.wrapApp(
-      MaterialApp.router(
+  runApp(SharedValue.wrapApp(
+    MaterialApp.router(
         theme: MainThemeData.mainThemeData,
-        routerConfig: GoRouter(
-          routes: [
-            GoRoute(
-              path: '/',
-              builder: (context, state) => const LoginScreen(),
-              redirect: (context, state) {
-                final OidcUser? user = app_state.cachedAuthedUser.of(context);
+        routerConfig: GoRouter(routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const LoginScreen(),
+            redirect: (context, state) {
+              final OidcUser? user = app_state.cachedAuthedUser.of(context);
 
-                if (user == null) {
-                  return null;
-                }
-                return '/main';
-              },
-            ),
-            GoRoute(
-              path: '/main',
-              builder: (context, state) => const MainScreen(),
-            ),
-          ]
-        ),
+              if (user == null) {
+                return null;
+              }
+              return '/main';
+            },
+          ),
+          GoRoute(
+            path: '/main',
+            builder: (context, state) => const MainScreen(),
+          ),
+        ]),
         builder: (context, child) {
           return FutureBuilder(
             future: app_state.initApp(),
@@ -63,8 +59,6 @@ void main() {
               return child!;
             },
           );
-        }
-      ),
-    )
-  );
+        }),
+  ));
 }

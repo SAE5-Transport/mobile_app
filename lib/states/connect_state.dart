@@ -37,8 +37,8 @@ final duendeManager = OidcUserManager.lazy(
 );
 
 final initMemoizer = AsyncMemoizer<void>();
-Future<void> initApp() {
-  return initMemoizer.runOnce(() async {
+Future<void> initApp() async {
+  await initMemoizer.runOnce(() async {
     currentManager.userChanges().listen((event) {
       cachedAuthedUser.$ = event;
       exampleLogger.info(

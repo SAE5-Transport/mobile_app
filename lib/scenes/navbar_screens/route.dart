@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -32,6 +34,8 @@ class _RoutePageState extends State<RoutePage> {
 
   Map<String, dynamic> startLocation = {};
   Map<String, dynamic> endLocation = {};
+  DateTime selectedDate = DateTime.now();
+  bool arrivingDate = false;
 
   bool lookingForStart = true;
   
@@ -565,6 +569,40 @@ class _RoutePageState extends State<RoutePage> {
                               )
                             ),
                           ),
+
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: DateTimeFormField(
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.calendar_today),
+                                  hintText: 'Date',
+                                  hintStyle: GoogleFonts.nunito(
+                                    textStyle: const TextStyle(
+                                      fontSize: 18,
+                                    )
+                                  ),
+                                  labelStyle: GoogleFonts.nunito(
+                                    textStyle: const TextStyle(
+                                      fontSize: 12,
+                                    )
+                                  ),
+                                  border: InputBorder.none,
+                                  filled: true
+                                ),
+                                initialPickerDateTime: DateTime.now(),
+                                initialValue: selectedDate,
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      selectedDate = value;
+                                    });
+                                  }
+                                },
+                              )
+                            )
+                          ),
                         ],
                       ),
                       
@@ -631,6 +669,35 @@ class _RoutePageState extends State<RoutePage> {
                               },
                               child: const Icon(Icons.search),
                             ),
+                          ),
+
+                          // Switch for arriving date
+                          Column(
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width * 0.2,
+                                ),
+                                child: AutoSizeText(
+                                  "Date d'arrivée ?",
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.nunito(),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+
+                              Switch(
+                                value: arrivingDate,
+                                activeColor: Colors.blue,
+                                onChanged: (bool value) {
+                                  // This is called when the user toggles the switch.
+                                  setState(() {
+                                    arrivingDate = value;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       )

@@ -589,7 +589,7 @@ class _RoutePageState extends State<RoutePage> {
                                     )
                                   ),
                                   border: InputBorder.none,
-                                  filled: true
+                                  filled: true,
                                 ),
                                 initialPickerDateTime: DateTime.now(),
                                 initialValue: selectedDate,
@@ -600,6 +600,7 @@ class _RoutePageState extends State<RoutePage> {
                                     });
                                   }
                                 },
+                                canClear: false,
                               )
                             )
                           ),

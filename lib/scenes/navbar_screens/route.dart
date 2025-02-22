@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:date_field/date_field.dart';
@@ -46,10 +47,10 @@ class _RoutePageState extends State<RoutePage> {
   );
 
   void drawRoute() {
+    polylines.clear();
+
     // Plot the line between the two points
     if (startLocation.isNotEmpty && endLocation.isNotEmpty) {
-      polylines.clear();
-
       polylines.add(Polyline(
         polylineId: const PolylineId('route'),
         points: [
@@ -159,8 +160,8 @@ class _RoutePageState extends State<RoutePage> {
         ),
 
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 300),
-          top: movingCamera ? -300 : MediaQuery.of(context).size.height * 0.03,
+          duration: const Duration(milliseconds: 500),
+          top: movingCamera ? -500 : MediaQuery.of(context).size.height * 0.03,
           left: 0,
           right: 0,
           curve: Curves.easeInOut,
@@ -385,6 +386,29 @@ class _RoutePageState extends State<RoutePage> {
                                     focusNode: focusNode,
                                     decoration: InputDecoration(
                                       prefixIcon: const Icon(Icons.search),
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          // Clear the text box & values
+                                          controller.clear();
+
+                                          startLocation = {};
+
+                                          // Remove the marker
+                                          if (startMarker != null) {
+                                            markers.remove(startMarker);
+                                          }
+
+                                          // Draw the route
+                                          drawRoute();
+
+                                          setState(() {
+                                            markers = markers;
+                                          });
+
+                                          lookingForStart = true;
+                                        },
+                                        icon: const Icon(Icons.clear),
+                                      ),
                                       hintText: 'Départ',
                                       hintStyle: GoogleFonts.nunito(
                                         textStyle: const TextStyle(
@@ -545,6 +569,34 @@ class _RoutePageState extends State<RoutePage> {
                                     focusNode: focusNode,
                                     decoration: InputDecoration(
                                       prefixIcon: const Icon(Icons.search),
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          // Clear the text box & values
+                                          controller.clear();
+
+                                          endLocation = {};
+
+                                          // Remove the marker
+                                          if (endMarker != null) {
+                                            markers.remove(endMarker);
+                                          }
+
+                                          // Draw the route
+                                          drawRoute();
+
+                                          setState(() {
+                                            markers = markers;
+                                          });
+
+                                          // If the start location is not empty, we make the possibility to put the end location by hand
+                                          if (startLocation.isNotEmpty) {
+                                            lookingForStart = false;
+                                          } else {
+                                            lookingForStart = true;
+                                          }
+                                        },
+                                        icon: const Icon(Icons.clear),
+                                      ),
                                       hintText: 'Arrivée',
                                       hintStyle: GoogleFonts.nunito(
                                         textStyle: const TextStyle(

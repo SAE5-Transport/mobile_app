@@ -32,10 +32,11 @@ void main() {
               redirect: (context, state) {
                 final OidcUser? user = app_state.cachedAuthedUser.of(context);
 
-                if (user == null) {
-                  return null;
+                if (user != null) {
+                  return '/main';
                 }
-                return '/main';
+
+                return null;
               },
             ),
             GoRoute(

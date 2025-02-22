@@ -1,6 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mobile_app/api/hexatransit_api.dart';
+import 'package:mobile_app/utils/assets.dart';
+import 'package:scroll_loop_auto_scroll/scroll_loop_auto_scroll.dart';
 
 class RoutePage extends StatefulWidget {
   const RoutePage({
@@ -12,234 +18,629 @@ class RoutePage extends StatefulWidget {
 }
 
 class _RoutePageState extends State<RoutePage> {
+  bool movingCamera = false;
+  TextEditingController startController = TextEditingController();
+  TextEditingController endController = TextEditingController();
+  SuggestionsController startSuggestionsController = SuggestionsController();
+  SuggestionsController endSuggestionsController = SuggestionsController();
+
+  Marker? startMarker;
+  Marker? endMarker;
+
+  Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+
+  Map<String, dynamic> startLocation = {};
+  Map<String, dynamic> endLocation = {};
+
+  bool lookingForStart = true;
+  
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(48.866667, 2.333333),
+    zoom: 14.4746,
+  );
+
+  void drawRoute() {
+    // Plot the line between the two points
+    if (startLocation.isNotEmpty && endLocation.isNotEmpty) {
+      polylines.clear();
+
+      polylines.add(Polyline(
+        polylineId: const PolylineId('route'),
+        points: [
+          LatLng(startLocation["lat"], startLocation["lon"]),
+          LatLng(endLocation["lat"], endLocation["lon"]),
+        ],
+        color: const Color.fromARGB(255, 80, 80, 80),
+        width: 5,
+        patterns: [PatternItem.dot, PatternItem.gap(10)], // Add pattern for dotted line
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController startController = TextEditingController();
-    TextEditingController endController = TextEditingController();
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        // Buttons to switch between "Favoris / Prévu" and "Historique"
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ToggleButtons(
-              color: Colors.black.withOpacity(0.60),
-              selectedColor: const Color(0xFF6200EE),
-              selectedBorderColor: const Color(0xFF6200EE),
-              fillColor: const Color(0xFF6200EE).withOpacity(0.08),
-              splashColor: const Color(0xFF6200EE).withOpacity(0.12),
-              hoverColor: const Color(0xFF6200EE).withOpacity(0.04),
-              borderRadius: BorderRadius.circular(4.0),
-              constraints: const BoxConstraints(
-                minHeight: 36.0
+        // Map
+        GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: _kGooglePlex,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+          onCameraMove: (position) {
+            setState(() {
+              movingCamera = true;
+            });
+          },
+          onCameraIdle: () {
+            setState(() {
+              movingCamera = false;
+            });
+          },
+          markers: markers,
+          polylines: polylines,
+          onTap: (position) {
+            if (lookingForStart) {
+              // Get location name
+              getLocationByCoordinates(position.latitude, position.longitude).then((location) {
+                if (location["name"].length <= 3) {
+                  startController.text = location["subname"].split(", ")[0];
+                } else {
+                  startController.text = location["name"];
+                }
+
+                startLocation = {
+                  "lat": double.parse(location["lat"].toString()),
+                  "lon": double.parse(location["lon"].toString())
+                };
+
+                // Add marker to the map
+                markers.remove(startMarker);
+                startMarker = Marker(
+                  markerId: const MarkerId('start'),
+                  position: LatLng(startLocation["lat"], startLocation["lon"]),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                );
+                markers.add(startMarker!);
+
+                // Draw the route
+                drawRoute();
+
+                setState(() {
+                  markers = markers;
+                  lookingForStart = false;
+                });
+              });
+            } else {
+              // Get location name
+              getLocationByCoordinates(position.latitude, position.longitude).then((location) {
+                if (location["name"].length <= 3) {
+                  endController.text = location["subname"].split(", ")[0];
+                } else {
+                  endController.text = location["name"];
+                }
+
+                endLocation = {
+                  "lat": double.parse(location["lat"].toString()),
+                  "lon": double.parse(location["lon"].toString())
+                };
+
+                // Add marker to the map
+                markers.remove(endMarker);
+                endMarker = Marker(
+                  markerId: const MarkerId('end'),
+                  position: LatLng(endLocation["lat"], endLocation["lon"]),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                );
+                markers.add(endMarker!);
+
+                // Draw the route
+                drawRoute();
+
+                setState(() {
+                  markers = markers;
+                  lookingForStart = true;
+                });
+              });
+            }
+
+            // Unfocus the text boxes
+            startSuggestionsController.close(retainFocus: false);
+            endSuggestionsController.close(retainFocus: false);
+          },
+        ),
+
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 300),
+          top: movingCamera ? -300 : MediaQuery.of(context).size.height * 0.03,
+          left: 0,
+          right: 0,
+          curve: Curves.easeInOut,
+          child: Column(
+            children: [
+              // Buttons to switch between "Favoris / Prévu" and "Historique"
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 4.0,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ToggleButtons(
+                      color: Colors.black.withOpacity(0.60),
+                      selectedColor: const Color(0xFF6200EE),
+                      selectedBorderColor: const Color(0xFF6200EE),
+                      fillColor: const Color(0xFF6200EE).withOpacity(0.08),
+                      splashColor: const Color(0xFF6200EE).withOpacity(0.12),
+                      hoverColor: const Color(0xFF6200EE).withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(4.0),
+                      constraints: const BoxConstraints(
+                        minHeight: 36.0
+                      ),
+                      isSelected: const [false, false],
+                      onPressed: (index) {
+                        // Respond to button selection
+                      },
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.star),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text('Favoris / Prévu'),
+                              ),
+                            ],
+                          )
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.history),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text('Historique'),
+                              ),
+                            ],
+                          )
+                        ),
+                      ],
+                    )
+                  )
+                ],
               ),
-              isSelected: const [false, false],
-              onPressed: (index) {
-                // Respond to button selection
-              },
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      Icon(Icons.star),
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text('Favoris / Prévu'),
+
+              // Search bar box
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF88D795),
+                    borderRadius: BorderRadius.circular(4.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.12),
+                        blurRadius: 4.0,
+                        offset: const Offset(0, 2),
                       ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Start & End text boxes
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: TypeAheadField( // Start text box
+                                controller: startController,
+                                suggestionsController: startSuggestionsController,
+                                suggestionsCallback: (search) async {
+                                  // Fetch suggestions from the server
+                                  List<Map<String, dynamic>> suggestions = await getLocations(search);
+
+                                  return suggestions;
+                                },
+                                itemBuilder: (context, suggestion) {
+                                  dynamic leading;
+                                  dynamic subtitle;
+                                  if (suggestion.containsKey("stops")) {
+                                    List<String> modes = [];
+                                    Map<String, Map<String, dynamic>> linesData = {};
+
+                                    // Get the lines data
+                                    for (var stop in suggestion["stops"]) {
+                                      for (var route in stop["routes"]) {
+                                        linesData.putIfAbsent(route["gtfsId"], () => route);
+                                      }
+                                    }
+
+                                    // Get the transport modes
+                                    for (var line in linesData.values) {
+                                      modes.add(line["mode"]);
+                                    }
+
+                                    // Get the icon for the transport mode
+                                    String? modeTop = getMainTransportModeAsset(modes);
+                                    leading = modeTop != null ? Image.asset(
+                                      modeTop,
+                                      width: 36,
+                                      height: 36,
+                                    ) : const Icon(Icons.directions_bus);
+
+                                    // Get lines icons
+                                    subtitle = FutureBuilder(
+                                      future: getTransportsIcons(linesData),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.hasData && snapshot.data != null) {
+                                            return ScrollLoopAutoScroll(
+                                              scrollDirection: Axis.horizontal,
+                                              enableScrollInput: false,
+                                              duplicateChild: 1,
+                                              gap: MediaQuery.of(context).size.width * 0.25,
+                                              delay: const Duration(milliseconds: 300),
+                                              duration: const Duration(seconds: 20),
+                                              child: snapshot.data!,
+                                            );
+                                          } else {
+                                            return const Text('No data available');
+                                          }
+                                        } else if (snapshot.hasError) {
+                                          print(snapshot.error);
+                                          return Text('Error: ${snapshot.error}');
+                                        } else {
+                                          return const CircularProgressIndicator();
+                                        }
+                                      },
+                                    );
+
+                                    return ListTile(
+                                      leading: leading,
+                                      title: Text(suggestion["name"]),
+                                      subtitle: subtitle,
+                                    );
+                                  } else {
+                                    if (suggestion["type"] == "town") {
+                                      leading = const Icon(Icons.location_city);
+
+                                      return ListTile(
+                                        leading: leading,
+                                        title: Text(suggestion["name"]),
+                                        subtitle: Text(suggestion["subname"]),
+                                      );
+                                    } else {
+                                      leading = const Icon(Icons.location_on);
+
+                                      return ListTile(
+                                        leading: leading,
+                                        title: Text(suggestion["name"]),
+                                        subtitle: Text(suggestion["subname"]),
+                                      );
+                                    }
+                                  }
+                                },
+                                onSelected: (value) {
+                                  startController.text = value["name"];
+                                  startLocation = {
+                                    "lat": double.parse(value["lat"].toString()),
+                                    "lon": double.parse(value["lon"].toString())
+                                  };
+
+                                  // Close suggestion (retain focus)
+                                  startSuggestionsController.close(retainFocus: false);
+
+                                  // Add marker to the map
+                                  markers.remove(startMarker);
+                                  startMarker = Marker(
+                                    markerId: const MarkerId('start'),
+                                    position: LatLng(startLocation["lat"], startLocation["lon"]),
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                                  );
+                                  markers.add(startMarker!);
+
+                                  // Draw the route
+                                  drawRoute();
+                                  
+                                  setState(() {
+                                    markers = markers;
+                                    lookingForStart = false;
+                                  });
+                                },
+                                transitionBuilder: (context, animation, child) {
+                                  return FadeTransition(
+                                    opacity: CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.fastOutSlowIn
+                                    ),
+                                    child: child,
+                                  );
+                                },
+                                hideOnEmpty: true,
+                                hideOnError: true,
+                                builder: (context, controller, focusNode) {
+                                  return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    decoration: InputDecoration(
+                                      prefixIcon: const Icon(Icons.search),
+                                      hintText: 'Départ',
+                                      hintStyle: GoogleFonts.nunito(
+                                        textStyle: const TextStyle(
+                                          fontSize: 18,
+                                        )
+                                      ),
+                                      labelStyle: GoogleFonts.nunito(
+                                        textStyle: const TextStyle(
+                                          fontSize: 12,
+                                        )
+                                      ),
+                                      border: InputBorder.none,
+                                      filled: true
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    textInputAction: TextInputAction.next,
+                                  );
+                                },
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                                ),
+                              )
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: TypeAheadField(
+                                controller: endController,
+                                suggestionsController: endSuggestionsController,
+                                suggestionsCallback: (search) async {
+                                  // Fetch suggestions from the server
+                                  List<Map<String, dynamic>> suggestions = await getLocations(search);
+
+                                  return suggestions;
+                                },
+                                itemBuilder: (context, suggestion) {
+                                  dynamic leading;
+                                  dynamic subtitle;
+                                  if (suggestion.containsKey("stops")) {
+                                    List<String> modes = [];
+                                    Map<String, Map<String, dynamic>> linesData = {};
+
+                                    // Get the lines data
+                                    for (var stop in suggestion["stops"]) {
+                                      for (var route in stop["routes"]) {
+                                        linesData.putIfAbsent(route["gtfsId"], () => route);
+                                      }
+                                    }
+
+                                    // Get the transport modes
+                                    for (var line in linesData.values) {
+                                      modes.add(line["mode"]);
+                                    }
+
+                                    // Get the icon for the transport mode
+                                    String? modeTop = getMainTransportModeAsset(modes);
+                                    leading = modeTop != null ? Image.asset(
+                                      modeTop,
+                                      width: 36,
+                                      height: 36,
+                                    ) : const Icon(Icons.directions_bus);
+
+                                    // Get lines icons
+                                    subtitle = FutureBuilder(
+                                      future: getTransportsIcons(linesData),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.hasData && snapshot.data != null) {
+                                            return ScrollLoopAutoScroll(
+                                              scrollDirection: Axis.horizontal,
+                                              enableScrollInput: false,
+                                              duplicateChild: 1,
+                                              gap: MediaQuery.of(context).size.width * 0.25,
+                                              delay: const Duration(milliseconds: 300),
+                                              duration: const Duration(seconds: 20),
+                                              child: snapshot.data!,
+                                            );
+                                          } else {
+                                            return const Text('No data available');
+                                          }
+                                        } else if (snapshot.hasError) {
+                                          print(snapshot.error);
+                                          return Text('Error: ${snapshot.error}');
+                                        } else {
+                                          return const CircularProgressIndicator();
+                                        }
+                                      },
+                                    );
+
+                                    return ListTile(
+                                      leading: leading,
+                                      title: Text(suggestion["name"]),
+                                      subtitle: subtitle,
+                                    );
+                                  } else {
+                                    if (suggestion["type"] == "town") {
+                                      leading = const Icon(Icons.location_city);
+
+                                      return ListTile(
+                                        leading: leading,
+                                        title: Text(suggestion["name"]),
+                                        subtitle: Text(suggestion["subname"]),
+                                      );
+                                    } else {
+                                      leading = const Icon(Icons.location_on);
+
+                                      return ListTile(
+                                        leading: leading,
+                                        title: Text(suggestion["name"]),
+                                        subtitle: Text(suggestion["subname"]),
+                                      );
+                                    }
+                                  }
+                                },
+                                onSelected: (value) {
+                                  endController.text = value["name"];
+                                  endLocation = {
+                                    "lat": double.parse(value["lat"].toString()),
+                                    "lon": double.parse(value["lon"].toString())
+                                  };
+
+                                  // Close suggestion (retain focus)
+                                  endSuggestionsController.close(retainFocus: false);
+
+                                  // Add marker to the map
+                                  markers.remove(endMarker);
+                                  endMarker = Marker(
+                                    markerId: const MarkerId('end'),
+                                    position: LatLng(endLocation["lat"], endLocation["lon"]),
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                                  );
+                                  markers.add(endMarker!);
+
+                                  // Draw the route
+                                  drawRoute();
+                                  
+                                  setState(() {
+                                    markers = markers;
+                                    lookingForStart = true;
+                                  });
+                                },
+                                transitionBuilder: (context, animation, child) {
+                                  return FadeTransition(
+                                    opacity: CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.fastOutSlowIn
+                                    ),
+                                    child: child,
+                                  );
+                                },
+                                hideOnEmpty: true,
+                                hideOnError: true,
+                                builder: (context, controller, focusNode) {
+                                  return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    decoration: InputDecoration(
+                                      prefixIcon: const Icon(Icons.search),
+                                      hintText: 'Arrivée',
+                                      hintStyle: GoogleFonts.nunito(
+                                        textStyle: const TextStyle(
+                                          fontSize: 18,
+                                        )
+                                      ),
+                                      labelStyle: GoogleFonts.nunito(
+                                        textStyle: const TextStyle(
+                                          fontSize: 12,
+                                        )
+                                      ),
+                                      border: InputBorder.none,
+                                      filled: true
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    textInputAction: TextInputAction.done,
+                                  );
+                                },
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                                ),
+                              )
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      Column(
+                        children: [
+                          // Swap button
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Swap the start and end text boxes
+                                String temp = startController.text;
+                                startController.text = endController.text;
+                                endController.text = temp;
+
+                                Map<String, dynamic> tempLocation = startLocation;
+                                startLocation = endLocation;
+                                endLocation = tempLocation;
+
+                                // Remove the markers
+                                if (startMarker != null) {
+                                  markers.remove(startMarker);
+                                }
+                                if (endMarker != null) {
+                                  markers.remove(endMarker);
+                                }
+
+                                // Swap the markers coordinates
+                                if (startLocation.isNotEmpty) {
+                                  startMarker = Marker(
+                                    markerId: const MarkerId('start'),
+                                    position: LatLng(startLocation["lat"], startLocation["lon"]),
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                                  );
+                                  markers.add(startMarker!);
+                                }
+
+                                if (endLocation.isNotEmpty) {
+                                  endMarker = Marker(
+                                    markerId: const MarkerId('end'),
+                                    position: LatLng(endLocation["lat"], endLocation["lon"]),
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                                  );
+                                  markers.add(endMarker!);
+                                }
+
+                                // Draw the route
+                                drawRoute();
+
+                                setState(() {
+                                  markers = markers;
+                                });
+                              },
+                              child: const Icon(Icons.swap_vert),
+                            ),
+                          ),
+
+                          // Search button
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Search for the route
+                              },
+                              child: const Icon(Icons.search),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   )
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      Icon(Icons.history),
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text('Historique'),
-                      ),
-                    ],
-                  )
-                ),
-              ],
-            )
-          ],
-        ),
-
-        // Search bar box
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF88D795),
-              borderRadius: BorderRadius.circular(4.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
-                  blurRadius: 4.0,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Start & End text boxes
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.65,
-                        child: TypeAheadField(
-                          controller: startController,
-                          suggestionsCallback: (search) {
-                            // Fetch suggestions from the server
-                            List<String> suggestions = [];
-
-                            return suggestions;
-                          },
-                          itemBuilder: (context, suggestion) {
-                            return ListTile(
-                              title: Text(suggestion),
-                            );
-                          },
-                          onSelected: (value) {
-                            print(value);
-                          },
-                          transitionBuilder: (context, animation, child) {
-                            return FadeTransition(
-                              opacity: CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.fastOutSlowIn
-                              ),
-                              child: child,
-                            );
-                          },
-                          hideOnEmpty: true,
-                          builder: (context, controller, focusNode) {
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.search),
-                                hintText: 'Départ',
-                                hintStyle: GoogleFonts.nunito(
-                                  textStyle: const TextStyle(
-                                    fontSize: 18,
-                                  )
-                                ),
-                                labelStyle: GoogleFonts.nunito(
-                                  textStyle: const TextStyle(
-                                    fontSize: 12,
-                                  )
-                                ),
-                                border: InputBorder.none,
-                                filled: true
-                              ),
-                              textAlign: TextAlign.center,
-                              textInputAction: TextInputAction.next,
-                            );
-                          }
-                        )
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.65,
-                        child: TypeAheadField(
-                          controller: endController,
-                          suggestionsCallback: (search) {
-                            // Fetch suggestions from the server
-                            List<String> suggestions = [];
-
-                            return suggestions;
-                          },
-                          itemBuilder: (context, suggestion) {
-                            return ListTile(
-                              title: Text(suggestion),
-                            );
-                          },
-                          onSelected: (value) {
-                            print(value);
-                          },
-                          transitionBuilder: (context, animation, child) {
-                            return FadeTransition(
-                              opacity: CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.fastOutSlowIn
-                              ),
-                              child: child,
-                            );
-                          },
-                          hideOnEmpty: true,
-                          builder: (context, controller, focusNode) {
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.search),
-                                hintText: 'Arrivée',
-                                hintStyle: GoogleFonts.nunito(
-                                  textStyle: const TextStyle(
-                                    fontSize: 18,
-                                  )
-                                ),
-                                labelStyle: GoogleFonts.nunito(
-                                  textStyle: const TextStyle(
-                                    fontSize: 12,
-                                  )
-                                ),
-                                border: InputBorder.none,
-                                filled: true
-                              ),
-                              textAlign: TextAlign.center,
-                              textInputAction: TextInputAction.done,
-                            );
-                          }
-                        )
-                      ),
-                    ),
-                  ],
-                ),
-
-                
-                Column(
-                  children: [
-                    // Swap button
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Swap the start and end text boxes
-                          String temp = startController.text;
-                          startController.text = endController.text;
-                          endController.text = temp;
-                        },
-                        child: const Icon(Icons.swap_vert),
-                      ),
-                    ),
-
-                    // Search button
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Search for the route
-                        },
-                        child: const Icon(Icons.search),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            )
+              ),
+            ],
           ),
-        ),
+        )
       ],
     );
   }

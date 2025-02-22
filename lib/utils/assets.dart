@@ -121,9 +121,9 @@ Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) asyn
       continue;
     }
 
-    print(line);
     // If no icon is available
     icons.add(
+      Padding(
         padding: const EdgeInsets.only(right: 4.0),
         child: Container(
           height: 24,

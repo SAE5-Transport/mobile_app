@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 class DarkThemeData {
   static ThemeData get darkThemeData {
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF88D795)),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF88D795)
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF88D795),
         foregroundColor: Colors.white,

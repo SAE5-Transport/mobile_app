@@ -8,9 +8,13 @@ import 'package:mobile_app/hive/functions.dart';
 import 'package:mobile_app/scenes/main_screen.dart';
 import 'package:mobile_app/states/connect_state.dart' as app_state;
 import 'package:oidc/oidc.dart';
+import 'package:intl/intl_standalone.dart' if (dart.library.html) 'package:intl/intl_browser.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // init intl
+  await findSystemLocale();
 
   // init Hive
   HiveHandler.initHive();

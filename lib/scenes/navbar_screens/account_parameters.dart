@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/assets/themes/dark_theme__data.dart';
+import 'package:mobile_app/assets/themes/main__theme_data.dart';
 import 'package:mobile_app/states/connect_state.dart' as app_state;
 
 class AccountParameters extends StatefulWidget {
@@ -28,7 +30,7 @@ class _AccountParametersState extends State<AccountParameters> {
                   CircleAvatar(
                     radius: 30,
                     backgroundImage: profilePicture != null
-                        ? NetworkImage(profilePicture!)
+                        ? NetworkImage(profilePicture)
                         : null,
                     child: profilePicture == null
                         ? const Icon(Icons.account_circle, size: 60)
@@ -37,7 +39,7 @@ class _AccountParametersState extends State<AccountParameters> {
                   const SizedBox(width: 10),
                   Text(
                     "Bonjour $username !",
-                    style: const TextStyle(fontSize: 24),
+                    style: Theme.of(context).textTheme.headlineLarge,
                   ),
                 ],
               ),
@@ -76,6 +78,16 @@ class _AccountParametersState extends State<AccountParameters> {
                   title: const Text("Changer email"),
                   trailing: const Icon(Icons.email),
                   onTap: () => _changeEmail(),
+                ),
+              ],
+            ),
+            ExpansionTile(
+              title: const Text("Personnalisation"),
+              children: [
+                ListTile(
+                  title: const Text("Changer de thème"),
+                  trailing: const Icon(Icons.edit),
+                  onTap: () => _changeTheme(),
                 ),
               ],
             ),
@@ -146,5 +158,28 @@ class _AccountParametersState extends State<AccountParameters> {
 
   void _deleteAccount() {
     // Implémentation pour supprimer le compte
+  }
+
+  Future _changeTheme() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: const Text('Sélectionner un thème'),
+            children: [
+              SimpleDialogOption(
+                child: const Text('Thème clair'),
+                onPressed: () {
+                },
+              ),
+              SimpleDialogOption(
+                child: const Text('Thème sombre'),
+                onPressed: () {
+                },
+              ),
+              // Add more themes as needed
+            ],
+          );
+        });
   }
 }

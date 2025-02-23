@@ -2,6 +2,7 @@ import 'package:bdaya_shared_value/bdaya_shared_value.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:mobile_app/assets/themes/dark_theme__data.dart';
 import 'package:mobile_app/scenes/login_screen.dart';
 import 'package:mobile_app/assets/themes/main__theme_data.dart';
 import 'package:mobile_app/hive/functions.dart';
@@ -22,7 +23,9 @@ void main() {
 
   runApp(SharedValue.wrapApp(
     MaterialApp.router(
+        themeMode: ThemeMode.system,
         theme: MainThemeData.mainThemeData,
+        darkTheme: DarkThemeData.darkThemeData,
         routerConfig: GoRouter(routes: [
           GoRoute(
             path: '/',

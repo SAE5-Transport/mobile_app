@@ -10,15 +10,15 @@ OidcUserManager currentManager = duendeManager;
 
 final duendeManager = OidcUserManager.lazy(
   discoveryDocumentUri: OidcUtils.getOpenIdConfigWellKnownUri(
-    Uri.parse('http://auth.20-199-76-32.nip.io/.well-known/openid-configuration'),
+    Uri.parse(
+        'http://auth.20-199-76-32.nip.io/.well-known/openid-configuration'),
   ),
-  
+
   // this is a public client,
   // so we use [OidcClientAuthentication.none] constructor.
   clientCredentials: const OidcClientAuthentication.clientSecretBasic(
-    clientId: "faknioafioanfioanfoanfoienriofcanjabfoinafjbfaf",
-    clientSecret: "fokafpaofjkopajfoiajfoiancoianiocnaoincioa"
-  ),
+      clientId: "faknioafioanfioanfoanfoienriofcanjabfoinafjbfaf",
+      clientSecret: "fokafpaofjkopajfoiajfoiancoianiocnaoincioa"),
   store: OidcDefaultStore(),
 
   // keyStore: JsonWebKeyStore(),
@@ -31,7 +31,7 @@ final duendeManager = OidcUserManager.lazy(
     // set to true to enable offline auth
     supportOfflineAuth: false,
     // scopes supported by the provider and needed by the client.
-    scope: ['openid', 'profile', 'email'],
+    scope: ['openid', 'profile', 'email', 'address', 'phone'],
     redirectUri: Uri.parse('com.uwucorp.hexatransit://redirect'),
   ),
 );

@@ -32,46 +32,56 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: userNameController,
-              decoration: const InputDecoration(
-                labelText: 'Nom d\'Utilisateur ',
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: userNameController,
+                decoration: const InputDecoration(
+                  labelText: 'username',
+                ),
               ),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Mot de Passe',
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
+                  labelText: 'password',
+                ),
               ),
-            ),
 
-            ElevatedButton(
-              onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                try {
-                  await app_state.currentManager.loginPassword(
-                    username: userNameController.text,
-                    password: passwordController.text,
-                  );
-                } catch (e) {
-                  app_state.exampleLogger.severe(e.toString());
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'L\'authentification a échoué. Vérifier vos informations d\'identification au près de FranceConnect',
+              ElevatedButton(
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  try {
+                    final result = await app_state.currentManager.loginPassword(
+                      username: userNameController.text,
+                      password: passwordController.text,
+                    );
+
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'loginPassword returned user id: ${result?.uid}',
+                        ),
                       ),
-                    ),
-                  );
-                }
-              },
-              child: const Text('Se connecter'),
-            ),
-          ]
-        )
+                    );
+                  } catch (e) {
+                    app_state.exampleLogger.severe(e.toString());
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'loginPassword failed!',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Text('login with Resource owner grant'),
+              ),
+            ]
+          ),
+        ),
       ),
     );
   }

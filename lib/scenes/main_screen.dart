@@ -60,6 +60,10 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _selectedIndex,
         type : BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
+        backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+        selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
+        unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
+        selectedLabelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(inherit: true),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

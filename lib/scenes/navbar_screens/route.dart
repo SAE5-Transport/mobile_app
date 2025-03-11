@@ -753,19 +753,12 @@ class _RoutePageState extends State<RoutePage> {
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.calendar_today),
                                   hintText: 'Date',
-                                  hintStyle: GoogleFonts.nunito(
-                                    textStyle: const TextStyle(
-                                      fontSize: 18,
-                                    )
-                                  ),
-                                  labelStyle: GoogleFonts.nunito(
-                                    textStyle: const TextStyle(
-                                      fontSize: 12,
-                                    )
-                                  ),
+                                  hintStyle: Theme.of(context).textTheme.bodySmall,
+                                  labelStyle: Theme.of(context).textTheme.bodySmall,
                                   border: InputBorder.none,
                                   filled: true,
                                 ),
+                                style: Theme.of(context).textTheme.displayLarge,
                                 initialPickerDateTime: DateTime.now(),
                                 initialValue: selectedDate,
                                 onChanged: (value) {

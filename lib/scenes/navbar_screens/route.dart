@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:date_field/date_field.dart';
@@ -8,8 +7,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_app/api/hexatransit_api.dart';
+import 'package:mobile_app/scenes/tabs/path_map.dart';
 import 'package:mobile_app/utils/assets.dart';
+import 'package:mobile_app/utils/functions.dart';
 import 'package:scroll_loop_auto_scroll/scroll_loop_auto_scroll.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RoutePage extends StatefulWidget {
   const RoutePage({
@@ -26,6 +28,7 @@ class _RoutePageState extends State<RoutePage> {
   TextEditingController endController = TextEditingController();
   SuggestionsController startSuggestionsController = SuggestionsController();
   SuggestionsController endSuggestionsController = SuggestionsController();
+  PanelController panelController = PanelController();
 
   Marker? startMarker;
   Marker? endMarker;
@@ -39,6 +42,8 @@ class _RoutePageState extends State<RoutePage> {
   bool arrivingDate = false;
 
   bool lookingForStart = true;
+
+  ValueNotifier<bool> isSelectingSearch = ValueNotifier(true);
   
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -64,6 +69,121 @@ class _RoutePageState extends State<RoutePage> {
     }
   }
 
+  Future<List<Widget>> buildPathButtons(Map<String, dynamic> data) async {
+    List<Widget> buttons = [];
+
+    for (var path in data["trip"]["tripPatterns"]) {
+      List<Widget> linesIcons = [];
+
+      for (var leg in path["legs"]) {
+        if (leg["line"] != null) {
+          linesIcons.add(await getTransportIconFromPath(leg["line"]));
+
+          // Add a separator
+          linesIcons.add(
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4.0),
+              child: Icon(
+                Icons.circle,
+                size: 4,
+              )
+            )
+          );
+        }
+      }
+
+      // Remove the last separator
+      if (linesIcons.isNotEmpty) {
+        linesIcons.removeLast();
+      
+
+        buttons.add(
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to PathMap
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PathMap(
+                    pathData: path,
+                  )
+                )
+              );
+
+            },
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+              elevation: WidgetStateProperty.all(0),
+            ),
+            child: Column(
+              children: [
+                // Lines | Duration
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Lines
+                    Expanded(
+                      child: Wrap(
+                        runSpacing: 2,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: linesIcons,
+                      ),
+                    ),
+
+                    // Duration
+                    Flexible(
+                      child: Text(
+                        "${convertSecondsToMinutes(double.parse(path["duration"].toString())).floor().toString()} min",
+                        style: GoogleFonts.nunito(
+                          fontSize: 18
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 2),
+
+                // Start & End
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Start
+                    Text(
+                      "${DateTime.parse(path["expectedStartTime"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(path["expectedStartTime"]).toLocal().minute.toString().padLeft(2, '0')}",
+                      style: GoogleFonts.nunito(
+                        fontSize: 18
+                      ),
+                    ),
+
+                    // End
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(106, 138, 175, 255),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      padding: const EdgeInsets.all(4.0),
+                      child: Text(
+                        "Arrivé à ${DateTime.parse(path["expectedEndTime"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(path["expectedEndTime"]).toLocal().minute.toString().padLeft(2, '0')}",
+                        style: GoogleFonts.nunito(
+                          fontSize: 14,
+                          color: const Color.fromARGB(255, 11, 88, 255),
+                        ),
+                      )
+                    )
+                  ],
+                )
+              ],
+            )
+          )
+        );
+      }
+    }
+
+    return buttons;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -86,6 +206,9 @@ class _RoutePageState extends State<RoutePage> {
               movingCamera = false;
             });
           },
+          rotateGesturesEnabled: isSelectingSearch.value,
+          scrollGesturesEnabled: isSelectingSearch.value,
+          zoomGesturesEnabled: isSelectingSearch.value,
           markers: markers,
           polylines: polylines,
           onTap: (position) {
@@ -161,7 +284,7 @@ class _RoutePageState extends State<RoutePage> {
 
         AnimatedPositioned(
           duration: const Duration(milliseconds: 500),
-          top: movingCamera ? -500 : MediaQuery.of(context).size.height * 0.03,
+          top: movingCamera || !isSelectingSearch.value ? -500 : MediaQuery.of(context).size.height * 0.03,
           left: 0,
           right: 0,
           curve: Curves.easeInOut,
@@ -719,6 +842,11 @@ class _RoutePageState extends State<RoutePage> {
                             child: ElevatedButton(
                               onPressed: () {
                                 // Search for the route
+
+                                setState(() {
+                                  isSelectingSearch.value = false;
+                                  panelController.open();
+                                });
                               },
                               child: const Icon(Icons.search),
                             ),
@@ -760,6 +888,185 @@ class _RoutePageState extends State<RoutePage> {
               ),
             ],
           ),
+        ),
+
+        SlidingUpPanel(
+          maxHeight: MediaQuery.of(context).size.height * 0.5,
+          minHeight: 0,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(50.0),
+            topRight: Radius.circular(50.0)
+          ),
+          controller: panelController,
+          color: const Color(0xFF88D795),
+          onPanelClosed: () {
+            setState(() {
+              isSelectingSearch.value = true;
+            });
+          },
+          panel: ValueListenableBuilder(
+            valueListenable: isSelectingSearch,
+            builder: (context, value, child) {
+              if (!value) {
+                return FutureBuilder(
+                  future: searchPaths(
+                    startLocation["lat"],
+                    startLocation["lon"],
+                    endLocation["lat"],
+                    endLocation["lon"],
+                    selectedDate,
+                    arrivingDate
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Container(
+                          margin: const EdgeInsets.only(
+                            top: 16.0,
+                            left: 8.0,
+                            right: 8.0,
+                          ),
+                          padding: const EdgeInsets.only(
+                            top: 16.0,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(50.0),
+                              topRight: Radius.circular(50.0)
+                            ),
+                          ),
+                          child: FutureBuilder(
+                            future: buildPathButtons(snapshot.data!),
+                            builder: (context, snapshot2) {
+                              if (snapshot2.connectionState == ConnectionState.done) {
+                                if (snapshot2.hasData && snapshot2.data != null) {
+                                  return ListView.separated(
+                                    itemBuilder: (context, index) {
+                                      return AnimatedOpacity(
+                                        opacity: 1.0,
+                                        curve: Curves.easeInOut,
+                                        duration: const Duration(milliseconds: 500),
+                                        child: snapshot2.data![index],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return Divider(
+                                        color: Colors.black.withOpacity(0.40),
+                                      );
+                                    },
+                                    itemCount: snapshot2.data!.length,
+                                  );
+                                } else {
+                                  print(snapshot2.error);
+                                  return const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.error),
+                                      Text('Aucun chemin trouvé :('),
+                                    ],
+                                  );
+                                }
+                              } else if (snapshot2.hasError) {
+                                print(snapshot2.error);
+                                return const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.error),
+                                    Text('Une erreur est survenue, veuillez rééssayer plus tard :('),
+                                  ],
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          )
+                        );
+                      } else {
+                        return Container(
+                          margin: const EdgeInsets.only(
+                            top: 16.0,
+                            left: 8.0,
+                            right: 8.0,
+                          ),
+                          padding: const EdgeInsets.only(
+                            top: 16.0,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(50.0),
+                              topRight: Radius.circular(50.0)
+                            ),
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error),
+                              Text('Aucun chemin trouvé :('),
+                            ],
+                          ),
+                        );
+                      }
+                    } else if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return Container(
+                        margin: const EdgeInsets.only(
+                          top: 16.0,
+                          left: 8.0,
+                          right: 8.0,
+                        ),
+                        padding: const EdgeInsets.only(
+                          top: 16.0,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(50.0),
+                            topRight: Radius.circular(50.0)
+                          ),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.error),
+                            Text('Une erreur est survenue, veuillez rééssayer plus tard :('),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        margin: const EdgeInsets.only(
+                          top: 16.0,
+                          left: 8.0,
+                          right: 8.0,
+                        ),
+                        padding: const EdgeInsets.only(
+                          top: 16.0,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(50.0),
+                            topRight: Radius.circular(50.0)
+                          ),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            Text('Recherche en cours...'),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                );
+              } else {
+                return Container();
+              }
+            },
+          )
         )
       ],
     );

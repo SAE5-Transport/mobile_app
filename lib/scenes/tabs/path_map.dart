@@ -179,6 +179,21 @@ class _PathMapState extends State<PathMap> {
               ),
             ),
 
+            // Register button
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton.filled(
+                icon: const Icon(Icons.bookmark_border),
+                color: Colors.black,
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.white),
+                  shape: WidgetStateProperty.all(const CircleBorder()),
+                ),
+                onPressed: () {}
+              ),
+            ),
+
             SlidingUpPanel(
               maxHeight: MediaQuery.of(context).size.height * 0.5,
               minHeight: MediaQuery.of(context).size.height * 0.1,
@@ -201,7 +216,8 @@ class _PathMapState extends State<PathMap> {
                           builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
                             if (snapshot.connectionState == ConnectionState.done) {
                               if (snapshot.hasData && snapshot.data != null) {
-                                return Expanded(
+                                return SizedBox(
+                                  width: MediaQuery.of(context).size.width * 0.6, // Adjust the width as needed
                                   child: Wrap(
                                     runSpacing: 4,
                                     crossAxisAlignment: WrapCrossAlignment.center,

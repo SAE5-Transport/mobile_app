@@ -123,9 +123,10 @@ class _RoutePageState extends State<RoutePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Lines
-                    Expanded(
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.6, // Adjust the width as needed
                       child: Wrap(
-                        runSpacing: 2,
+                        runSpacing: 4,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: linesIcons,
                       ),

@@ -62,12 +62,13 @@ class _HomeState extends State<Home> {
     if (savedFavorites != null) {
       setState(() {
         _favoriteAddresses.addAll(List<Map<String, dynamic>>.from(
-            json.decode(savedFavorites).map((item) => {
-                  'address': item['address'],
-                  'name': item['name'],
-                  'icon': IconData(item['icon'], fontFamily: 'MaterialIcons'),
-                  'color': Color(item['color'])
-                })));
+          json.decode(savedFavorites).map((item) => {
+            'address': item['address'],
+            'name': item['name'],
+            'icon': IconData(item['icon'], fontFamily: 'MaterialIcons'),
+            'color': Color(item['color'])
+          })
+        ));
       });
     }
   }
@@ -75,15 +76,14 @@ class _HomeState extends State<Home> {
   Future<void> _saveFavorites() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(
-        'favorites',
-        json.encode(_favoriteAddresses
-            .map((item) => {
-                  'address': item['address'],
-                  'name': item['name'],
-                  'icon': item['icon'].codePoint,
-                  'color': item['color'].value
-                })
-            .toList()));
+      'favorites',
+      json.encode(_favoriteAddresses.map((item) => {
+        'address': item['address'],
+        'name': item['name'],
+        'icon': item['icon'].codePoint,
+        'color': item['color'].value
+      }).toList())
+    );
   }
 
   @override
@@ -180,7 +180,7 @@ class _HomeState extends State<Home> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
             ),
@@ -313,7 +313,7 @@ class _HomeState extends State<Home> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Supprimer le favori'),
+          title: const Text('Supprimer le favori'),
           content:
               Text('Voulez-vous vraiment supprimer "${favorite['name']}" ?'),
           actions: [

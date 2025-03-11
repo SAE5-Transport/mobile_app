@@ -87,11 +87,65 @@ List<dynamic> sortLinesByGtfsRouteType(Map<String, Map<String, dynamic>> lines, 
   return linesList;
 }
 
+Future<Widget> getTransportIconFromPath(Map<String, dynamic> line) async {
+  Map<String, dynamic> priorityMap = await loadPriorityData();
+
+  String lineId = line['id'];
+
+  if (priorityMap[lineId] != null) {
+    return Image.asset(
+      priorityMap[lineId]['picto'],
+      width: 24,
+      height: 24,
+    );
+  } else {
+    Widget iconPlus = Container();
+    if (lineId.contains("fr-sncf-tgv")) {
+      iconPlus = Image.asset(
+        'assets/logo/fr-sncf-tgv/logo.png',
+        height: 32,
+        width: 42,
+      );
+    } else if (lineId.contains("fr-sncf-ter")) {
+      iconPlus = Image.asset(
+        'assets/logo/fr-sncf-ter/logo.png',
+        height: 32,
+        width: 28,
+      );
+    }
+
+    return IntrinsicWidth(
+      child: Row(
+        children: [
+          iconPlus,
+          Container(
+            height: 24,
+            decoration: BoxDecoration(
+              color: HexColor(line['presentation']['colour'] ?? '#000000'),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Center(
+              child: Text(
+                line['publicCode'],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: HexColor(line['presentation']['textColour'] ?? '#FFFFFF'),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+        ],
+      )
+    );
+  }
+}
+
 Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) async {
   List<Widget> icons = [];
   Map<String, dynamic> priorityMap = await loadPriorityData();
-
-  List<String> linesAdded = [];
 
   List<dynamic> sortedLines = sortLinesByGtfsRouteType(linesData, priorityMap);
 
@@ -110,40 +164,31 @@ Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) asyn
           ),
         ),
       );
-    }
-  }
-
-  for (var line in sortedLines) {
-    String lineId = line['gtfsId'];
-
-    // Check if the line has already been added
-    if (linesAdded.contains(lineId)) {
-      continue;
-    }
-
-    // If no icon is available
-    icons.add(
-      Padding(
-        padding: const EdgeInsets.only(right: 4.0),
-        child: Container(
-          height: 24,
-          decoration: BoxDecoration(
-            color: HexColor(line['color']),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Center(
-            child: Text(
-              line['shortName'],
-              style: TextStyle(
-                color: HexColor(line['textColor']),
-                fontSize: 12,
+    } else {
+      // If no icon is available
+      icons.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 4.0),
+          child: Container(
+            height: 24,
+            decoration: BoxDecoration(
+              color: HexColor(line['color']),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Center(
+              child: Text(
+                line['shortName'],
+                style: TextStyle(
+                  color: HexColor(line['textColor']),
+                  fontSize: 12,
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   return Row(

@@ -39,3 +39,27 @@ Future<Map<String, dynamic>> getLocationByCoordinates(double lat, double lon) as
     return {};
   }
 }
+
+Future<Map<String, dynamic>> searchPaths(double departure_lat, double departure_lon, double arrival_lat, double arrival_lon, DateTime date, bool isArrival) async {
+  var queryParams = {
+    'departure_lat': departure_lat.toString(),
+    'departure_lon': departure_lon.toString(),
+    'arrival_lat': arrival_lat.toString(),
+    'arrival_lon': arrival_lon.toString(),
+    'start': date.toIso8601String().replaceFirst('Z', ''),
+  };
+
+  if (isArrival) {
+    queryParams['arrival'] = isArrival.toString();
+  }
+
+  var url = Uri.http(host, '/v1/search/searchPaths', queryParams);
+  print(url.toString());
+  var response = await http.get(url).timeout(const Duration(seconds: 30));
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    return {};
+  }
+}

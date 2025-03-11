@@ -5,6 +5,18 @@ allprojects {
     }
 }
 
+buildscript {
+    ext.kotlin_version = '1.9.0'  // Make sure this is 1.9.0 or higher
+    repositories {
+        google()  // Required for Android dependencies
+        mavenCentral()  // Required for Kotlin dependencies
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.8.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"

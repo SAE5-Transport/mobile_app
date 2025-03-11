@@ -55,6 +55,7 @@ dependencies:
   date_field: ^6.0.3+1
   auto_size_text: ^3.0.0
   intl: ^0.20.2
+  sliding_up_panel: ^2.0.0+1
 
 dev_dependencies:
   flutter_test:
@@ -93,6 +94,8 @@ flutter:
     - assets/logo/fr-idf/rer/
     - assets/logo/fr-idf/tram/
     - assets/logo/fr-idf/transilien/
+    - assets/logo/fr-sncf-tgv/
+    - assets/logo/fr-sncf-ter/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

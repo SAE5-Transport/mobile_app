@@ -30,7 +30,7 @@ class _PathMapState extends State<PathMap> {
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
 
-  ValueNotifier<double> _mapHeightFactor = ValueNotifier<double>(0.9);
+  final ValueNotifier<double> _mapHeightFactor = ValueNotifier<double>(0.9);
 
   void _zoomToFitPolygon() {
     List<LatLng> coordinates = polylines.expand((polyline) => polyline.points).toList();

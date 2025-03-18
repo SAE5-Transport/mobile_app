@@ -19,22 +19,22 @@ String? getMainTransportModeAsset(List<String> modes) {
 
   // Get top mode from the list
   if (modes.contains('BUS')) {
-    topMode = 'assets/icons/bus.png';
+    topMode = 'assets/icons/transportMode/bus.png';
   }
   if (modes.contains('TRAM')) {
-    topMode = 'assets/icons/tram.png';
+    topMode = 'assets/icons/transportMode/tram.png';
   }
   if (modes.contains('SUBWAY')) {
-    topMode = 'assets/icons/metro.png';
+    topMode = 'assets/icons/transportMode/metro.png';
   }
   if (modes.contains('RAIL')) {
-    topMode = 'assets/icons/train.png';
+    topMode = 'assets/icons/transportMode/train.png';
   }
   if (modes.contains('CABLE_CAR')) {
-    topMode = 'assets/icons/cable.png';
+    topMode = 'assets/icons/transportMode/cable.png';
   } 
   if (modes.contains('FERRY')) {
-    topMode = 'assets/icons/ferry.png';
+    topMode = 'assets/icons/transportMode/ferry.png';
   }
 
   return topMode;

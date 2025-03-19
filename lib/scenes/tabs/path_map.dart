@@ -132,7 +132,7 @@ class _PathMapState extends State<PathMap> {
   Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
-      child:SafeArea(
+      child: SafeArea(
         child: Stack(
           clipBehavior: Clip.none,
           children: [

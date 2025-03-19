@@ -1,0 +1,287 @@
+[
+    {
+        "companyLogo": "assets/logo/fr-idf/idfm.png",
+        "width": 150.0,
+        "height": 100.0,
+        "lines": [
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/rer.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01742",
+                    "lineLogo": "assets/logo/fr-idf/rer/RER_A_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01743",
+                    "lineLogo": "assets/logo/fr-idf/rer/RER_B_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01727",
+                    "lineLogo": "assets/logo/fr-idf/rer/RER_C_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01728",
+                    "lineLogo": "assets/logo/fr-idf/rer/RER_D_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01729",
+                    "lineLogo": "assets/logo/fr-idf/rer/RER_E_couleur_RVB.png",
+                    "scale": 1.0
+                }
+            ],
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/metro.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01371",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_1_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01372",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_2_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01373",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_3_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01386",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_3B_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01374",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_4_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01375",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_5_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01376",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_6_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01377",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_7_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01387",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_7B_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01378",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_8_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01379",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_9_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01380",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_10_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01381",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_11_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01382",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_12_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01383",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_13_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01384",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_14_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_15_couleur_RVB.png",
+                    "scale": 1.0,
+                    "isDisabled": true
+                },
+                {
+                    "lineId": "",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_16_couleur_RVB.png",
+                    "scale": 1.0,
+                    "isDisabled": true
+                },
+                {
+                    "lineId": "",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_17_couleur_RVB.png",
+                    "scale": 1.0,
+                    "isDisabled": true
+                },
+                {
+                    "lineId": "",
+                    "lineLogo": "assets/logo/fr-idf/metro/metro_18_couleur_RVB.png",
+                    "scale": 1.0,
+                    "isDisabled": true
+                }
+            ],
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/tram.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01389",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_1_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01390",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_2_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01391",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_3a_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01679",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_3b_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01843",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_4_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01844",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_5_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01794",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_6_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01774",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_7_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01795",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_8_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C02317",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_9_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C02528",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_10_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01999",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_11_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C02529",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_12_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C02344",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_13_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C02732",
+                    "lineLogo": "assets/logo/fr-idf/tram/tram_14_couleur_RVB.png",
+                    "scale": 1.0,
+                    "isDisabled": true
+                }
+            ],
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/train.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01737",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_H_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01739",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_J_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01738",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_K_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01740",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_L_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01736",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_N_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01730",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_P_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01731",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_R_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C01741",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_U_couleur_RVB.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-idf:IDFM:C02711",
+                    "lineLogo": "assets/logo/fr-idf/transilien/train_V_couleur_RVB.png",
+                    "scale": 1.0
+                }
+            ]
+        ]
+    }
+]

@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 class MainThemeData {
   static ThemeData get mainThemeData {
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 51, 153, 68),),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF88D795)
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color.fromARGB(255, 51, 153, 68),
         foregroundColor: Colors.white,

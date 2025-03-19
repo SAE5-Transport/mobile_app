@@ -63,3 +63,19 @@ Future<Map<String, dynamic>> searchPaths(double departure_lat, double departure_
     return {};
   }
 }
+
+Future<List<Map<String, dynamic>>> getIncidentsOnLines(List<String> lines) async {
+  try {
+    var url = Uri.http(host, '/v1/search/incidentsOnLines', {'lineIds': lines});
+    var response = await http.get(url).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body)["lines"]);
+    } else {
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching incidents on lines: $e');
+    return [];
+  }
+}

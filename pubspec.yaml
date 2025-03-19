@@ -103,7 +103,8 @@ flutter:
   assets:
     - assets/data/
     - assets/icons/transportMode/
-    - assets/icons/trafic
+    - assets/icons/trafic/
+    - assets/logo/fr-idf/
     - assets/logo/fr-idf/metro/
     - assets/logo/fr-idf/rer/
     - assets/logo/fr-idf/tram/

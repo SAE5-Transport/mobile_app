@@ -214,23 +214,6 @@ class _LineAlertBoxState extends State<LineAlertBox> {
               for (var alert in line["situations"]) {
                 if (alert["severity"] == "severe") {
                   // Handle travaux case
-                  if (alert["description"][0]["value"].toLowerCase().contains("travaux") && !travaux) {
-                    if ((!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) && !travaux) {
-                      logoPerturbation = Image.asset(
-                        'assets/icons/trafic/works_future.png',
-                        width: MediaQuery.of(context).size.width * 0.05,
-                        height: MediaQuery.of(context).size.width * 0.05,
-                      );
-                    } else if (!travaux) {
-                      logoPerturbation = Image.asset(
-                        'assets/icons/trafic/works.png',
-                        width: MediaQuery.of(context).size.width * 0.05,
-                        height: MediaQuery.of(context).size.width * 0.05,
-                      );
-                      travaux = true;
-                    }
-                  }
-
                   if (!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) {
                     continue;
                   }
@@ -242,14 +225,20 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                     width: MediaQuery.of(context).size.width * 0.05,
                     height: MediaQuery.of(context).size.width * 0.05,
                   );
-
-                  break;
                 } else if (alert["severity"] == "normal" && defaultSeverity != "severe") {
                   // Handle travaux case
                   if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
                     if ((!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) && !travaux) {
                       logoPerturbation = Image.asset(
                         'assets/icons/trafic/works_future.png',
+                        width: MediaQuery.of(context).size.width * 0.05,
+                        height: MediaQuery.of(context).size.width * 0.05,
+                      );
+                    } else if (alert["description"][0]["value"].toLowerCase().contains("interrompu") || alert["description"][0]["value"].toLowerCase().contains("aucun train")) {
+                      defaultColor = Colors.red;
+                      defaultSeverity = "severe";
+                      logoPerturbation = Image.asset(
+                        'assets/icons/trafic/noservice.png',
                         width: MediaQuery.of(context).size.width * 0.05,
                         height: MediaQuery.of(context).size.width * 0.05,
                       );

@@ -98,23 +98,14 @@ class _InfoTraficPageState extends State<InfoTraficPage> {
   }
 
   Future<List<String>> getLineIds() async {
-    List<String> lineIds = [];
-
-    // Load data from assets
     final jsonData = await rootBundle.loadString('assets/data/trafic.json');
+    final data = jsonDecode(jsonData) as List<dynamic>;
 
-    // Parse JSON
-    List<dynamic> data = jsonDecode(jsonData);
-
-    for (var company in data) {
-      for (var lineCategory in company["lines"]) {
-        for (var line in lineCategory) {
-          if (line["lineId"] != null) lineIds.add(line["lineId"]);
-        }
-      }
-    }
-
-    return lineIds;
+    return data.expand((company) => company["lines"])
+               .expand((lineCategory) => lineCategory)
+               .where((line) => line["lineId"] != null)
+               .map<String>((line) => line["lineId"] as String)
+               .toList();
   }
 
   @override
@@ -147,7 +138,7 @@ class _InfoTraficPageState extends State<InfoTraficPage> {
                     }();
 
                     // Create loop catching data every 1 minute
-                    Timer.periodic(const Duration(minutes: 1), (timer) async {
+                    Timer.periodic(const Duration(seconds: 10), (timer) async {
                       List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
                       alertData.value = alerts;
                     });
@@ -198,92 +189,73 @@ class LineAlertBox extends StatefulWidget {
 class _LineAlertBoxState extends State<LineAlertBox> {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<List<Map<String, dynamic>>>(
       valueListenable: widget.alertData,
-      builder: (context, value, child) {
-        Color defaultColor = Colors.grey;
-        String? defaultSeverity;
+      builder: (context, alerts, child) {
+        Color borderColor = Colors.grey;
         Widget logoPerturbation = Container();
-        bool travaux = false;
+        bool hasWorks = false;
 
-        if (value.isNotEmpty) {
-          defaultColor = Colors.lightGreen[300]!;
+        for (var line in alerts) {
+          if (line["id"] == widget.lineId) {
+            for (var alert in line["situations"]) {
+              final severity = alert["severity"];
+              final validityPeriod = alert["validityPeriod"];
+              final isValid = DateTime.now().isAfter(DateTime.parse(validityPeriod["startTime"]).toLocal()) &&
+                              DateTime.now().isBefore(DateTime.parse(validityPeriod["endTime"]).toLocal());
 
-          for (var line in value) {
-            if (line["id"] == widget.lineId) {
-              for (var alert in line["situations"]) {
-                if (alert["severity"] == "severe") {
-                  // Handle travaux case
-                  if (!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) {
-                    continue;
-                  }
+              if (severity == "severe") {
+                if (!isValid) continue;
 
-                  defaultColor = Colors.red;
-                  defaultSeverity = alert["severity"];
-                  logoPerturbation = Image.asset(
-                    'assets/icons/trafic/noservice.png',
-                    width: MediaQuery.of(context).size.width * 0.05,
-                    height: MediaQuery.of(context).size.width * 0.05,
-                  );
-                } else if (alert["severity"] == "normal" && defaultSeverity != "severe") {
-                  // Handle travaux case
-                  if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
-                    if ((!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) && !travaux) {
-                      logoPerturbation = Image.asset(
-                        'assets/icons/trafic/works_future.png',
-                        width: MediaQuery.of(context).size.width * 0.05,
-                        height: MediaQuery.of(context).size.width * 0.05,
-                      );
-                    } else if (alert["description"][0]["value"].toLowerCase().contains("interrompu") || alert["description"][0]["value"].toLowerCase().contains("aucun train")) {
-                      defaultColor = Colors.red;
-                      defaultSeverity = "severe";
-                      logoPerturbation = Image.asset(
-                        'assets/icons/trafic/noservice.png',
-                        width: MediaQuery.of(context).size.width * 0.05,
-                        height: MediaQuery.of(context).size.width * 0.05,
-                      );
-                    } else if (!travaux) {
-                      defaultColor = Colors.orange;
-                      logoPerturbation = Image.asset(
-                        'assets/icons/trafic/works.png',
-                        width: MediaQuery.of(context).size.width * 0.05,
-                        height: MediaQuery.of(context).size.width * 0.05,
-                      );
-                      travaux = true;
-                    }
-                  } else {
-                    if (!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) {
-                      continue;
-                    }
-
-                    defaultColor = Colors.orange;
+                borderColor = Colors.red;
+                logoPerturbation = Image.asset(
+                  'assets/icons/trafic/servicestopped.png',
+                  width: MediaQuery.of(context).size.width * 0.05,
+                  height: MediaQuery.of(context).size.width * 0.05,
+                );
+                break;
+              } else if (severity == "normal") {
+                if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
+                  if (!isValid && !hasWorks) {
                     logoPerturbation = Image.asset(
-                      'assets/icons/trafic/servicedisrupted.png',
+                      'assets/icons/trafic/works_future.png',
                       width: MediaQuery.of(context).size.width * 0.05,
                       height: MediaQuery.of(context).size.width * 0.05,
                     );
-
-                    break;
+                  } else {
+                    hasWorks = true;
+                    borderColor = Colors.red;
+                    logoPerturbation = Image.asset(
+                      'assets/icons/trafic/works.png',
+                      width: MediaQuery.of(context).size.width * 0.05,
+                      height: MediaQuery.of(context).size.width * 0.05,
+                    );
                   }
-                } else if (alert["severity"] == "unknown" && defaultSeverity != "severe" && defaultSeverity != "normal") {
-                  if (!DateTime.now().isAfter(DateTime.parse(alert["validityPeriod"]["startTime"]).toLocal()) || !DateTime.now().isBefore(DateTime.parse(alert["validityPeriod"]["endTime"]).toLocal())) {
-                    continue;
-                  }
+                } else {
+                  if (!isValid) continue;
 
-                  defaultSeverity = alert["severity"];
+                  borderColor = Colors.orange;
                   logoPerturbation = Image.asset(
-                    'assets/icons/trafic/info.png',
+                    'assets/icons/trafic/servicedisrupted.png',
                     width: MediaQuery.of(context).size.width * 0.05,
                     height: MediaQuery.of(context).size.width * 0.05,
                   );
                 }
+              } else if (severity == "unknown" && borderColor == Colors.grey) {
+                if (!isValid) continue;
+
+                logoPerturbation = Image.asset(
+                  'assets/icons/trafic/info.png',
+                  width: MediaQuery.of(context).size.width * 0.05,
+                  height: MediaQuery.of(context).size.width * 0.05,
+                );
               }
             }
           }
         }
 
-        if (widget.isDisabled != null && widget.isDisabled!) {
-          defaultColor = Colors.grey;
+        if (widget.isDisabled == true) {
+          borderColor = Colors.grey;
         }
 
         return Stack(
@@ -293,7 +265,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: defaultColor,
+                  color: borderColor,
                   width: 5,
                 ),
               ),
@@ -303,17 +275,16 @@ class _LineAlertBoxState extends State<LineAlertBox> {
               child: Image.asset(
                 widget.lineLogo,
                 scale: widget.scale,
-              )
+              ),
             ),
-
             Positioned(
               bottom: 2,
               right: 2,
               child: logoPerturbation,
             ),
-          ]
+          ],
         );
-      }
+      },
     );
   }
 }

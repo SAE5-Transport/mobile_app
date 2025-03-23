@@ -192,7 +192,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
     return ValueListenableBuilder<List<Map<String, dynamic>>>(
       valueListenable: widget.alertData,
       builder: (context, alerts, child) {
-        Color borderColor = Colors.grey;
+        Color borderColor = Colors.lightGreen;
         Widget logoPerturbation = Container();
         bool hasWorks = false;
 
@@ -208,6 +208,18 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                 if (!isValid) continue;
 
                 borderColor = Colors.red;
+
+                if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
+                  hasWorks = true;
+                  logoPerturbation = Image.asset(
+                    'assets/icons/trafic/works.png',
+                    width: MediaQuery.of(context).size.width * 0.05,
+                    height: MediaQuery.of(context).size.width * 0.05,
+                  );
+
+                  continue;
+                }
+
                 logoPerturbation = Image.asset(
                   'assets/icons/trafic/servicestopped.png',
                   width: MediaQuery.of(context).size.width * 0.05,
@@ -222,9 +234,19 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                       width: MediaQuery.of(context).size.width * 0.05,
                       height: MediaQuery.of(context).size.width * 0.05,
                     );
-                  } else {
+                  }
+                  
+                  if (alert["description"][0]["value"].toLowerCase().contains("interrompu") && (isValid && !hasWorks)) {
                     hasWorks = true;
                     borderColor = Colors.red;
+                    logoPerturbation = Image.asset(
+                      'assets/icons/trafic/works.png',
+                      width: MediaQuery.of(context).size.width * 0.05,
+                      height: MediaQuery.of(context).size.width * 0.05,
+                    );
+                  } else if (isValid && !hasWorks) {
+                    hasWorks = true;
+                    borderColor = Colors.orange;
                     logoPerturbation = Image.asset(
                       'assets/icons/trafic/works.png',
                       width: MediaQuery.of(context).size.width * 0.05,
@@ -241,7 +263,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                     height: MediaQuery.of(context).size.width * 0.05,
                   );
                 }
-              } else if (severity == "unknown" && borderColor == Colors.grey) {
+              } else if (severity == "unknown") {
                 if (!isValid) continue;
 
                 logoPerturbation = Image.asset(
@@ -252,6 +274,10 @@ class _LineAlertBoxState extends State<LineAlertBox> {
               }
             }
           }
+        }
+
+        if (alerts.isEmpty) {
+          borderColor = Colors.grey;
         }
 
         if (widget.isDisabled == true) {

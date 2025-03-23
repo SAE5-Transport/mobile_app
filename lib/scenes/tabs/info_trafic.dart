@@ -226,7 +226,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                   height: MediaQuery.of(context).size.width * 0.05,
                 );
                 break;
-              } else if (severity == "normal") {
+              } else if (severity == "normal" && severity != "severe") {
                 if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
                   if (!isValid && !hasWorks) {
                     logoPerturbation = Image.asset(
@@ -263,7 +263,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                     height: MediaQuery.of(context).size.width * 0.05,
                   );
                 }
-              } else if (severity == "unknown") {
+              } else if (severity == "unknown" && severity != "normal" && severity != "severe") {
                 if (!isValid) continue;
 
                 logoPerturbation = Image.asset(

@@ -226,8 +226,7 @@
                 {
                     "lineId": "fr-idf:IDFM:C02732",
                     "lineLogo": "assets/logo/fr-idf/tram/tram_14_couleur_RVB.png",
-                    "scale": 1.0,
-                    "isDisabled": true
+                    "scale": 1.0
                 }
             ],
             [

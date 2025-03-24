@@ -17,6 +17,8 @@ class InfoTraficPage extends StatefulWidget {
 
 class _InfoTraficPageState extends State<InfoTraficPage> {
   ValueNotifier<List<Map<String, dynamic>>> alertData = ValueNotifier([]);
+  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  ValueNotifier<DateTime?> lastRefreshTime = ValueNotifier(null);
 
   Future<List<Widget>> getCompaniesAlertBoxes() async {
     List<Widget> companiesAlertBoxes = [];
@@ -87,6 +89,55 @@ class _InfoTraficPageState extends State<InfoTraficPage> {
               height: company["height"],
             ),
 
+            // Add a refresh button
+            ValueListenableBuilder<bool>(
+              valueListenable: isLoading,
+              builder: (context, loading, child) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (loading)
+                      const CircularProgressIndicator(
+                        color: Colors.white,
+                      ) // Affiche une animation de chargement
+                    else
+                      IconButton(
+                        icon: const Icon(
+                          Icons.refresh,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onPressed: () async {
+                          isLoading.value = true; // Début du chargement
+                          lastRefreshTime = ValueNotifier(null); // Réinitialise l'heure du dernier rafraîchissement
+                          List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
+                          alertData.value = alerts;
+                          lastRefreshTime.value = DateTime.now(); // Met à jour l'heure du dernier rafraîchissement
+                          isLoading.value = false; // Fin du chargement
+                        },
+                      ),
+                    const SizedBox(width: 8),
+                    ValueListenableBuilder<DateTime?>(
+                      valueListenable: lastRefreshTime,
+                      builder: (context, lastRefresh, child) {
+                        return Text(
+                          lastRefresh != null
+                              ? "Mis à jour à ${lastRefresh.hour}:${lastRefresh.minute.toString().padLeft(2, '0')}"
+                              : "",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+
+            const SizedBox(height: 12),
+
             // Insert the lines alert boxes
             ...companyAlertBoxes,
           ],
@@ -126,39 +177,36 @@ class _InfoTraficPageState extends State<InfoTraficPage> {
       body: Material(
         color: Theme.of(context).colorScheme.primary,
         child: SafeArea(
-          child: Column(
-            children: [
-              FutureBuilder(
-                future: getCompaniesAlertBoxes(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != null) {
-                    () async {
-                      List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
-                      alertData.value = alerts;
-                    }();
+          child: SingleChildScrollView( // Ajout d'un widget défilable
+            child: Column(
+              children: [
+                FutureBuilder(
+                  future: getCompaniesAlertBoxes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data != null) {
+                      () async {
+                        isLoading.value = true;
+                        List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
+                        alertData.value = alerts;
+                        lastRefreshTime.value = DateTime.now();
+                        isLoading.value = false;
+                      }();
 
-                    // Create loop catching data every 1 minute
-                    Timer.periodic(const Duration(seconds: 10), (timer) async {
-                      List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
-                      alertData.value = alerts;
-                    });
-
-                    return ListView(
-                      padding: const EdgeInsets.only(left: 4, right: 4),
-                      shrinkWrap: true,
-                      children: snapshot.data!,
-                    );
-                  } else if (snapshot.hasError) {
-                    if (kDebugMode) {
-                      print(snapshot.error);
+                      return ListView(
+                        padding: const EdgeInsets.only(left: 4, right: 4),
+                        shrinkWrap: true, // Permet à ListView de s'adapter à son contenu
+                        physics: const NeverScrollableScrollPhysics(), // Désactive le défilement interne
+                        children: snapshot.data!,
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return const CircularProgressIndicator();
                     }
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                },
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -195,6 +243,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
         Color borderColor = Colors.lightGreen;
         Widget logoPerturbation = Container();
         bool hasWorks = false;
+        String maxSeverity = "unknown";
 
         for (var line in alerts) {
           if (line["id"] == widget.lineId) {
@@ -209,24 +258,24 @@ class _LineAlertBoxState extends State<LineAlertBox> {
 
                 borderColor = Colors.red;
 
+                maxSeverity = "severe";
+
                 if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
-                  hasWorks = true;
                   logoPerturbation = Image.asset(
                     'assets/icons/trafic/works.png',
                     width: MediaQuery.of(context).size.width * 0.05,
                     height: MediaQuery.of(context).size.width * 0.05,
                   );
-
-                  continue;
+                } else {
+                  logoPerturbation = Image.asset(
+                    'assets/icons/trafic/servicestopped.png',
+                    width: MediaQuery.of(context).size.width * 0.05,
+                    height: MediaQuery.of(context).size.width * 0.05,
+                  );
                 }
-
-                logoPerturbation = Image.asset(
-                  'assets/icons/trafic/servicestopped.png',
-                  width: MediaQuery.of(context).size.width * 0.05,
-                  height: MediaQuery.of(context).size.width * 0.05,
-                );
+                
                 break;
-              } else if (severity == "normal" && severity != "severe") {
+              } else if (severity == "normal" && maxSeverity != "severe") {
                 if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
                   if (!isValid && !hasWorks) {
                     logoPerturbation = Image.asset(
@@ -234,10 +283,9 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                       width: MediaQuery.of(context).size.width * 0.05,
                       height: MediaQuery.of(context).size.width * 0.05,
                     );
-                  }
-                  
-                  if (alert["description"][0]["value"].toLowerCase().contains("interrompu") && (isValid && !hasWorks)) {
+                  } else if (alert["description"][0]["value"].toLowerCase().contains("interrompu") && isValid && !hasWorks) {
                     hasWorks = true;
+                    maxSeverity = "severe";
                     borderColor = Colors.red;
                     logoPerturbation = Image.asset(
                       'assets/icons/trafic/works.png',
@@ -246,6 +294,7 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                     );
                   } else if (isValid && !hasWorks) {
                     hasWorks = true;
+                    maxSeverity = "normal";
                     borderColor = Colors.orange;
                     logoPerturbation = Image.asset(
                       'assets/icons/trafic/works.png',
@@ -256,6 +305,8 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                 } else {
                   if (!isValid) continue;
 
+                  maxSeverity = "severe";
+
                   borderColor = Colors.orange;
                   logoPerturbation = Image.asset(
                     'assets/icons/trafic/servicedisrupted.png',
@@ -263,8 +314,10 @@ class _LineAlertBoxState extends State<LineAlertBox> {
                     height: MediaQuery.of(context).size.width * 0.05,
                   );
                 }
-              } else if (severity == "unknown" && severity != "normal" && severity != "severe") {
+              } else if (severity == "unknown" && maxSeverity != "normal" && maxSeverity != "severe") {
                 if (!isValid) continue;
+
+                maxSeverity = "unknown";
 
                 logoPerturbation = Image.asset(
                   'assets/icons/trafic/info.png',

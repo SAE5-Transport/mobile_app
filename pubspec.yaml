@@ -109,6 +109,7 @@ flutter:
     - assets/logo/fr-idf/rer/
     - assets/logo/fr-idf/tram/
     - assets/logo/fr-idf/transilien/
+    - assets/logo/fr-idf/cable/
     - assets/logo/fr-sncf-tgv/
     - assets/logo/fr-sncf-ter/
 

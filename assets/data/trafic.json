@@ -6,7 +6,7 @@
         "lines": [
             [
                 {
-                    "transportLogo": "assets/icons/transportMode/rer.png",
+                    "transportLogo": "assets/icons/transportMode/rer_white.png",
                     "width": 50.0,
                     "height": 50.0
                 },
@@ -38,7 +38,7 @@
             ],
             [
                 {
-                    "transportLogo": "assets/icons/transportMode/metro.png",
+                    "transportLogo": "assets/icons/transportMode/metro_white.png",
                     "width": 50.0,
                     "height": 50.0
                 },
@@ -149,7 +149,7 @@
             ],
             [
                 {
-                    "transportLogo": "assets/icons/transportMode/tram.png",
+                    "transportLogo": "assets/icons/transportMode/tram_white.png",
                     "width": 50.0,
                     "height": 50.0
                 },
@@ -231,7 +231,7 @@
             ],
             [
                 {
-                    "transportLogo": "assets/icons/transportMode/train.png",
+                    "transportLogo": "assets/icons/transportMode/train_white.png",
                     "width": 50.0,
                     "height": 50.0
                 },
@@ -279,6 +279,19 @@
                     "lineId": "fr-idf:IDFM:C02711",
                     "lineLogo": "assets/logo/fr-idf/transilien/train_V_couleur_RVB.png",
                     "scale": 1.0
+                }
+            ],
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/cable_white.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "",
+                    "lineLogo": "assets/logo/fr-idf/cable/cable_1_couleur_RVB.png",
+                    "scale": 1.0,
+                    "isDisabled": true
                 }
             ]
         ]

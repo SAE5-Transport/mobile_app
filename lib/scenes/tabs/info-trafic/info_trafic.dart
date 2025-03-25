@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mobile_app/api/hexatransit_api.dart';
 
 class InfoTraficPage extends StatefulWidget {
+  final Map<String, dynamic> companyData;
+
   const InfoTraficPage({
     super.key,
+    required this.companyData,
   });
 
   @override
@@ -21,139 +21,127 @@ class _InfoTraficPageState extends State<InfoTraficPage> {
   ValueNotifier<DateTime?> lastRefreshTime = ValueNotifier(null);
 
   Future<List<Widget>> getCompaniesAlertBoxes() async {
+    List<Widget> companyAlertBoxes = [];
     List<Widget> companiesAlertBoxes = [];
 
-    // Load data from assets
-    final jsonData = await rootBundle.loadString('assets/data/trafic.json');
+    for (var lineCategory in widget.companyData["lines"]) {
+      List<Widget> linesAlertBoxes = [];
+      Widget? lineTransportLogo;
 
-    // Parse JSON
-    List<dynamic> data = jsonDecode(jsonData);
-
-    for (var company in data) {
-      List<Widget> companyAlertBoxes = [];
-
-      for (var lineCategory in company["lines"]) {
-        List<Widget> linesAlertBoxes = [];
-        Widget? lineTransportLogo;
-
-        for (var line in lineCategory) {
-          if (line["transportLogo"] != null) {
-            lineTransportLogo = Image.asset(
-              line["transportLogo"],
-              width: line["width"],
-              height: line["height"],
-            );
-          } else {
-            linesAlertBoxes.add(
-              LineAlertBox(
-                lineId: line["lineId"],
-                lineLogo: line["lineLogo"],
-                scale: line["scale"],
-                isDisabled: line["isDisabled"],
-                alertData: alertData,
-              )
-            );
-          }
+      for (var line in lineCategory) {
+        if (line["transportLogo"] != null) {
+          lineTransportLogo = Image.asset(
+            line["transportLogo"],
+            width: line["width"],
+            height: line["height"],
+          );
+        } else {
+          linesAlertBoxes.add(
+            LineAlertBox(
+              lineId: line["lineId"],
+              lineLogo: line["lineLogo"],
+              scale: line["scale"],
+              isDisabled: line["isDisabled"],
+              alertData: alertData,
+            )
+          );
         }
-
-        companyAlertBoxes.add(
-          Row(
-            children: [
-              lineTransportLogo ?? Container(),
-
-              const SizedBox(width: 8),
-
-              Expanded( // Allow the Wrap to expand and wrap its children
-                child: Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  children: linesAlertBoxes,
-                ),
-              ),
-            ],
-          )
-        );
-
-        companyAlertBoxes.add(const SizedBox(height: 12));
       }
 
-      // Wrap each company's alert boxes in a Column
-      companiesAlertBoxes.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      companyAlertBoxes.add(
+        Row(
           children: [
-            // Insert logo of the company
-            Image.asset(
-              company["companyLogo"],
-              width: company["width"],
-              height: company["height"],
+            lineTransportLogo ?? Container(),
+
+            const SizedBox(width: 8),
+
+            Expanded( // Allow the Wrap to expand and wrap its children
+              child: Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: linesAlertBoxes,
+              ),
             ),
-
-            // Add a refresh button
-            ValueListenableBuilder<bool>(
-              valueListenable: isLoading,
-              builder: (context, loading, child) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (loading)
-                      const CircularProgressIndicator(
-                        color: Colors.white,
-                      ) // Affiche une animation de chargement
-                    else
-                      IconButton(
-                        icon: const Icon(
-                          Icons.refresh,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        onPressed: () async {
-                          isLoading.value = true; // Début du chargement
-                          lastRefreshTime = ValueNotifier(null); // Réinitialise l'heure du dernier rafraîchissement
-                          List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
-                          alertData.value = alerts;
-                          lastRefreshTime.value = DateTime.now(); // Met à jour l'heure du dernier rafraîchissement
-                          isLoading.value = false; // Fin du chargement
-                        },
-                      ),
-                    const SizedBox(width: 8),
-                    ValueListenableBuilder<DateTime?>(
-                      valueListenable: lastRefreshTime,
-                      builder: (context, lastRefresh, child) {
-                        return Text(
-                          lastRefresh != null
-                              ? "Mis à jour à ${lastRefresh.hour}:${lastRefresh.minute.toString().padLeft(2, '0')}"
-                              : "",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 12),
-
-            // Insert the lines alert boxes
-            ...companyAlertBoxes,
           ],
         )
       );
+
+      companyAlertBoxes.add(const SizedBox(height: 12));
     }
+
+    // Wrap each company's alert boxes in a Column
+    companiesAlertBoxes.add(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Insert logo of the company
+          Image.asset(
+            widget.companyData["companyLogo"],
+            width: widget.companyData["width"],
+            height: widget.companyData["height"],
+          ),
+
+          // Add a refresh button
+          ValueListenableBuilder<bool>(
+            valueListenable: isLoading,
+            builder: (context, loading, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (loading)
+                    const CircularProgressIndicator(
+                      color: Colors.white,
+                    ) // Affiche une animation de chargement
+                  else
+                    IconButton(
+                      icon: const Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      onPressed: () async {
+                        isLoading.value = true; // Début du chargement
+                        lastRefreshTime = ValueNotifier(null); // Réinitialise l'heure du dernier rafraîchissement
+                        List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
+                        alertData.value = alerts;
+                        lastRefreshTime.value = DateTime.now(); // Met à jour l'heure du dernier rafraîchissement
+                        isLoading.value = false; // Fin du chargement
+                      },
+                    ),
+                  const SizedBox(width: 8),
+                  ValueListenableBuilder<DateTime?>(
+                    valueListenable: lastRefreshTime,
+                    builder: (context, lastRefresh, child) {
+                      return Text(
+                        lastRefresh != null
+                            ? "Mis à jour à ${lastRefresh.hour}:${lastRefresh.minute.toString().padLeft(2, '0')}"
+                            : "",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          // Insert the lines alert boxes
+          ...companyAlertBoxes,
+        ],
+      )
+    );
 
     return companiesAlertBoxes;
   }
 
   Future<List<String>> getLineIds() async {
-    final jsonData = await rootBundle.loadString('assets/data/trafic.json');
-    final data = jsonDecode(jsonData) as List<dynamic>;
-
-    return data.expand((company) => company["lines"])
-               .expand((lineCategory) => lineCategory)
+    return widget.companyData["lines"]
+               .expand((lineCategory) => lineCategory as Iterable)
                .where((line) => line["lineId"] != null)
                .map<String>((line) => line["lineId"] as String)
                .toList();
@@ -177,36 +165,42 @@ class _InfoTraficPageState extends State<InfoTraficPage> {
       body: Material(
         color: Theme.of(context).colorScheme.primary,
         child: SafeArea(
-          child: SingleChildScrollView( // Ajout d'un widget défilable
-            child: Column(
-              children: [
-                FutureBuilder(
-                  future: getCompaniesAlertBoxes(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data != null) {
-                      () async {
-                        isLoading.value = true;
-                        List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
-                        alertData.value = alerts;
-                        lastRefreshTime.value = DateTime.now();
-                        isLoading.value = false;
-                      }();
+          child: FutureBuilder(
+            future: getCompaniesAlertBoxes(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                () async {
+                  isLoading.value = true;
+                  List<Map<String, dynamic>> alerts = await getIncidentsOnLines(await getLineIds());
+                  alertData.value = alerts;
+                  lastRefreshTime.value = DateTime.now();
+                  isLoading.value = false;
+                }();
 
-                      return ListView(
-                        padding: const EdgeInsets.only(left: 4, right: 4),
-                        shrinkWrap: true, // Permet à ListView de s'adapter à son contenu
-                        physics: const NeverScrollableScrollPhysics(), // Désactive le défilement interne
-                        children: snapshot.data!,
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
-                ),
-              ],
-            ),
+                return Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            ListView(
+                              padding: const EdgeInsets.only(left: 4, right: 4),
+                              shrinkWrap: true, // Allow ListView to adapt to its content
+                              physics: const NeverScrollableScrollPhysics(), // Disable internal scrolling
+                              children: snapshot.data!,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
           ),
         ),
       ),

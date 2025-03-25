@@ -295,5 +295,128 @@
                 }
             ]
         ]
+    },
+    {
+        "companyLogo": "assets/logo/fr-star/star.png",
+        "width": 150.0,
+        "height": 100.0,
+        "lines": [
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/metro_white.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-star:5-1001",
+                    "lineLogo": "assets/logo/fr-star/metro/A.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-1002",
+                    "lineLogo": "assets/logo/fr-star/metro/B.png",
+                    "scale": 1.0
+                }
+            ],
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/bus_white.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-star:5-0001",
+                    "lineLogo": "assets/logo/fr-star/bus/C1.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-0002",
+                    "lineLogo": "assets/logo/fr-star/bus/C2.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-0003",
+                    "lineLogo": "assets/logo/fr-star/bus/C3.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-0004",
+                    "lineLogo": "assets/logo/fr-star/bus/C4.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-0005",
+                    "lineLogo": "assets/logo/fr-star/bus/C5.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-0006",
+                    "lineLogo": "assets/logo/fr-star/bus/C6.png",
+                    "scale": 1.0
+                },
+                {
+                    "lineId": "fr-star:5-0007",
+                    "lineLogo": "assets/logo/fr-star/bus/C7.png",
+                    "scale": 0.5
+                },
+                {
+                    "lineId": "fr-star:5-0047",
+                    "lineLogo": "assets/logo/fr-star/bus/C7ex.png",
+                    "scale": 0.3
+                }
+            ],
+            [
+                {
+                    "transportLogo": "assets/icons/transportMode/bus_white.png",
+                    "width": 50.0,
+                    "height": 50.0
+                },
+                {
+                    "lineId": "fr-star:5-0010",
+                    "lineLogo": "assets/logo/fr-star/bus/10.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0011",
+                    "lineLogo": "assets/logo/fr-star/bus/11.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0012",
+                    "lineLogo": "assets/logo/fr-star/bus/12.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0013",
+                    "lineLogo": "assets/logo/fr-star/bus/13.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0014",
+                    "lineLogo": "assets/logo/fr-star/bus/14.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0032",
+                    "lineLogo": "assets/logo/fr-star/bus/32.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0034",
+                    "lineLogo": "assets/logo/fr-star/bus/34.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0038",
+                    "lineLogo": "assets/logo/fr-star/bus/38.png",
+                    "scale": 0.3
+                },
+                {
+                    "lineId": "fr-star:5-0039",
+                    "lineLogo": "assets/logo/fr-star/bus/39.png",
+                    "scale": 0.3
+                }
+            ]
+        ]
     }
 ]

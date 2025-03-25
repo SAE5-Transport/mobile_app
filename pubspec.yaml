@@ -116,6 +116,7 @@ flutter:
     - assets/logo/fr-sncf-ter/
     - assets/logo/fr-star/
     - assets/logo/fr-star/metro/
+    - assets/logo/fr-star/bus/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

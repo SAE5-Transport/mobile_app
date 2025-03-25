@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:mobile_app/scenes/main_screen.dart';
-import 'package:mobile_app/scenes/tabs/info_trafic.dart';
+import 'package:mobile_app/scenes/tabs/info-trafic/select_operator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -27,7 +27,6 @@ class _HomeState extends State<Home> {
   final Location _location = Location();
 
   final List<Map<String, dynamic>> _favoriteAddresses = [];
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -180,7 +179,7 @@ class _HomeState extends State<Home> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const InfoTraficPage(),
+                              builder: (context) => const SelectOperatorInfoTrafic()
                             ),
                           );
                         },

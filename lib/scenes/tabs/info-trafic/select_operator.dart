@@ -35,12 +35,13 @@ class _SelectOperatorInfoTraficState extends State<SelectOperatorInfoTrafic> {
           },
           child: Container(
             margin: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(
                 color: Colors.grey,
                 width: 1,
-              ),
+              )
               borderRadius: BorderRadius.circular(8),
             ),
             width: MediaQuery.of(context).size.width / 2 - 16,

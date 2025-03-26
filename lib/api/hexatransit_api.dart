@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-String host = '20-199-76-32.nip.io:8080';
+String host = 'api.hexatransit.clarifygdps.com';
 
 Future<List<Map<String, dynamic>>> getLocations(String search) async {
   if (search.isEmpty) {

@@ -11,7 +11,7 @@ OidcUserManager currentManager = duendeManager;
 final duendeManager = OidcUserManager.lazy(
   discoveryDocumentUri: OidcUtils.getOpenIdConfigWellKnownUri(
     Uri.parse(
-        'http://auth.20-199-76-32.nip.io/.well-known/openid-configuration'),
+        'http://auth.hexatransit.clarifygdps.com/.well-known/openid-configuration'),
   ),
 
   // this is a public client,

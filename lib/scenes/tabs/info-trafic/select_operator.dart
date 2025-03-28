@@ -14,7 +14,7 @@ class SelectOperatorInfoTrafic extends StatefulWidget {
 }
 
 class _SelectOperatorInfoTraficState extends State<SelectOperatorInfoTrafic> {
-  Future<Container> getOperators() async {
+  Future<SizedBox> getOperators() async {
     List<Widget> operators = [];
 
     final jsonData = await rootBundle.loadString('assets/data/trafic.json');
@@ -41,9 +41,10 @@ class _SelectOperatorInfoTraficState extends State<SelectOperatorInfoTrafic> {
               border: Border.all(
                 color: Colors.grey,
                 width: 1,
-              )
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
+            // ignore: use_build_context_synchronously
             width: MediaQuery.of(context).size.width / 2 - 16,
             height: 100,
             child: Image.asset(
@@ -54,7 +55,7 @@ class _SelectOperatorInfoTraficState extends State<SelectOperatorInfoTrafic> {
       );
     }
 
-    return Container(
+    return SizedBox(
       width: double.infinity, // Ensure the Wrap takes the full width of the screen
       child: Wrap(
         alignment: WrapAlignment.center,

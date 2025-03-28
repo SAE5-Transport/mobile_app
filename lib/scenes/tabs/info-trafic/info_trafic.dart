@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_app/api/hexatransit_api.dart';
+import 'package:mobile_app/scenes/tabs/info-trafic/info_trafic_details.dart';
+import 'package:mobile_app/utils/assets.dart';
 
 class InfoTraficPage extends StatefulWidget {
   final Map<String, dynamic> companyData;
@@ -229,133 +231,44 @@ class LineAlertBox extends StatefulWidget {
 }
 
 class _LineAlertBoxState extends State<LineAlertBox> {
+  Map<String, dynamic> lineData = {};
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<Map<String, dynamic>>>(
       valueListenable: widget.alertData,
       builder: (context, alerts, child) {
-        Color borderColor = Colors.lightGreen;
-        Widget logoPerturbation = Container();
-        bool hasWorks = false;
-        String maxSeverity = "unknown";
+        Map<String, dynamic> lineLogoData = getLineLogoWithPerturbation(alerts, widget.lineId, widget.lineLogo, widget.isDisabled, context);
+        lineData = lineLogoData['lineData'];
 
-        for (var line in alerts) {
-          if (line["id"] == widget.lineId) {
-            for (var alert in line["situations"]) {
-              final severity = alert["severity"];
-              final validityPeriod = alert["validityPeriod"];
-              final isValid = DateTime.now().isAfter(DateTime.parse(validityPeriod["startTime"]).toLocal()) &&
-                              DateTime.now().isBefore(DateTime.parse(validityPeriod["endTime"]).toLocal());
+        return GestureDetector(
+          onTap: () {
+            if (lineData.isEmpty) return;
 
-              if (severity == "severe") {
-                if (!isValid) continue;
-
-                borderColor = Colors.red;
-
-                maxSeverity = "severe";
-
-                if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
-                  logoPerturbation = Image.asset(
-                    'assets/icons/trafic/works.png',
-                    width: MediaQuery.of(context).size.width * 0.05,
-                    height: MediaQuery.of(context).size.width * 0.05,
-                  );
-                } else {
-                  logoPerturbation = Image.asset(
-                    'assets/icons/trafic/servicestopped.png',
-                    width: MediaQuery.of(context).size.width * 0.05,
-                    height: MediaQuery.of(context).size.width * 0.05,
-                  );
-                }
-                
-                break;
-              } else if (severity == "normal" && maxSeverity != "severe") {
-                if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
-                  if (!isValid && !hasWorks) {
-                    logoPerturbation = Image.asset(
-                      'assets/icons/trafic/works_future.png',
-                      width: MediaQuery.of(context).size.width * 0.05,
-                      height: MediaQuery.of(context).size.width * 0.05,
-                    );
-                  } else if (alert["description"][0]["value"].toLowerCase().contains("interrompu") && isValid && !hasWorks) {
-                    hasWorks = true;
-                    maxSeverity = "severe";
-                    borderColor = Colors.red;
-                    logoPerturbation = Image.asset(
-                      'assets/icons/trafic/works.png',
-                      width: MediaQuery.of(context).size.width * 0.05,
-                      height: MediaQuery.of(context).size.width * 0.05,
-                    );
-                  } else if (isValid && !hasWorks) {
-                    hasWorks = true;
-                    maxSeverity = "normal";
-                    borderColor = Colors.orange;
-                    logoPerturbation = Image.asset(
-                      'assets/icons/trafic/works.png',
-                      width: MediaQuery.of(context).size.width * 0.05,
-                      height: MediaQuery.of(context).size.width * 0.05,
-                    );
-                  }
-                } else {
-                  if (!isValid) continue;
-
-                  maxSeverity = "severe";
-
-                  borderColor = Colors.orange;
-                  logoPerturbation = Image.asset(
-                    'assets/icons/trafic/servicedisrupted.png',
-                    width: MediaQuery.of(context).size.width * 0.05,
-                    height: MediaQuery.of(context).size.width * 0.05,
-                  );
-                }
-              } else if (severity == "unknown" && maxSeverity != "normal" && maxSeverity != "severe") {
-                if (!isValid) continue;
-
-                maxSeverity = "unknown";
-
-                logoPerturbation = Image.asset(
-                  'assets/icons/trafic/info.png',
-                  width: MediaQuery.of(context).size.width * 0.05,
-                  height: MediaQuery.of(context).size.width * 0.05,
-                );
-              }
-            }
-          }
-        }
-
-        if (alerts.isEmpty) {
-          borderColor = Colors.grey;
-        }
-
-        if (widget.isDisabled == true) {
-          borderColor = Colors.grey;
-        }
-
-        return Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: borderColor,
-                  width: 5,
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => InfoTraficDetails(
+                  lineData: lineData,
+                  logo: lineLogoData['logo'],
                 ),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0); // Start from the right
+                  const end = Offset.zero; // End at the current position
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
               ),
-              width: MediaQuery.of(context).size.width * 0.13,
-              height: MediaQuery.of(context).size.width * 0.13,
-              padding: const EdgeInsets.all(4),
-              child: Image.asset(
-                widget.lineLogo,
-                scale: widget.scale,
-              ),
-            ),
-            Positioned(
-              bottom: 2,
-              right: 2,
-              child: logoPerturbation,
-            ),
-          ],
+            );
+          },
+          child: lineLogoData['logo'],
         );
       },
     );

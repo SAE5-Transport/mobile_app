@@ -11,6 +11,14 @@ class HexColor extends Color {
     return int.parse(hexColor, radix: 16);
   }
 
+  // Add the fromHex method
+  static Color fromHex(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
 
@@ -320,4 +328,55 @@ Map<String, dynamic> getLineLogoWithPerturbation(List<Map<String, dynamic>> aler
     ),
     'lineData': lineData,
   };
+}
+
+Widget getLogoPerturbation(Map<String, dynamic> alert) {
+  final severity = alert["severity"];
+  final validityPeriod = alert["validityPeriod"];
+  final isValid = DateTime.now().isAfter(DateTime.parse(validityPeriod["startTime"]).toLocal()) &&
+                  DateTime.now().isBefore(DateTime.parse(validityPeriod["endTime"]).toLocal());
+
+  if (severity == "severe") {
+    if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
+      if (!isValid) {
+        return Image.asset(
+          'assets/icons/trafic/works_future.png',
+        );
+      } else if (isValid) {
+        return Image.asset(
+          'assets/icons/trafic/works.png',
+        );
+      }
+    } else {
+      return Image.asset(
+        'assets/icons/trafic/servicestopped.png',
+      );
+    }
+  } else if (severity == "normal") {
+    if (alert["description"][0]["value"].toLowerCase().contains("travaux")) {
+      if (!isValid) {
+        return Image.asset(
+          'assets/icons/trafic/works_future.png',
+        );
+      } else if (alert["description"][0]["value"].toLowerCase().contains("interrompu") && isValid) {
+        return Image.asset(
+          'assets/icons/trafic/works.png',
+        );
+      } else if (isValid) {
+        return Image.asset(
+          'assets/icons/trafic/works.png',
+        );
+      }
+    } else {
+      return Image.asset(
+        'assets/icons/trafic/servicedisrupted.png',
+      );
+    }
+  } else if (severity == "unknown") {
+    return Image.asset(
+      'assets/icons/trafic/info.png',
+    );
+  }
+
+  return Container(); // Default case if none of the conditions match
 }

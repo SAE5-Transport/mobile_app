@@ -49,9 +49,7 @@ class _InfoTraficDetailsState extends State<InfoTraficDetails> {
         addedAlertIds.add(alertId); // Mark the alert as added
       } 
       // Check if the alert is valid today (same day as 'now')
-      else if (startTime.day == now.day &&
-          startTime.month == now.month &&
-          startTime.year == now.year) {
+      else if (startTime.day == now.day && startTime.month == now.month && startTime.year == now.year && now.isBefore(endTime)) {
         today.add(alert);
         addedAlertIds.add(alertId); // Mark the alert as added
       }
@@ -288,28 +286,6 @@ class _InfoTraficDetailsState extends State<InfoTraficDetails> {
                   );
                                   }
               ),
-
-              /*Expanded(
-                child: ListView.builder(
-                  itemCount: widget.lineData['info'].length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      color: colorScheme.primaryContainer,
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: ListTile(
-                        title: Text(
-                          widget.lineData['info'][index]['title'],
-                          style: TextStyle(color: colorScheme.onPrimaryContainer),
-                        ),
-                        subtitle: Text(
-                          widget.lineData['info'][index]['description'],
-                          style: TextStyle(color: colorScheme.onPrimaryContainer),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),*/
             ],
           ),
         )

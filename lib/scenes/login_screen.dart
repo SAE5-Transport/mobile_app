@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile_app/states/connect_state.dart' as app_state;
 
@@ -58,6 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       username: userNameController.text,
                       password: passwordController.text,
                     );
+                    if(context.mounted) {
+                      context.pop();
+                    }
                   } catch (e) {
                     app_state.exampleLogger.severe(e.toString());
                     messenger.showSnackBar(

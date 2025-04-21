@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_app/assets/themes/dark_theme__data.dart';
-import 'package:mobile_app/assets/themes/main__theme_data.dart';
 import 'package:mobile_app/states/connect_state.dart' as app_state;
 
 class AccountParameters extends StatefulWidget {
@@ -18,98 +16,107 @@ class _AccountParametersState extends State<AccountParameters> {
     String? gender = app_state.cachedAuthedUser.of(context)?.userInfo['gender'];
     String? profilePicture;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Compte")),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+    if (app_state.isConnected(context)) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Compte")),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: profilePicture != null
+                          ? NetworkImage(profilePicture)
+                          : null,
+                      child: profilePicture == null
+                          ? const Icon(Icons.account_circle, size: 60)
+                          : null,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      "Bonjour $username !",
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(thickness: 2),
+              ExpansionTile(
+                title: const Text("Info Personnelle"),
                 children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: profilePicture != null
-                        ? NetworkImage(profilePicture)
-                        : null,
-                    child: profilePicture == null
-                        ? const Icon(Icons.account_circle, size: 60)
-                        : null,
+                  ListTile(
+                    title: const Text("Changer de prénom"),
+                    trailing: const Icon(Icons.edit),
+                    onTap: () => _changeUsername(),
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    "Bonjour $username !",
-                    style: Theme.of(context).textTheme.headlineLarge,
+                  ListTile(
+                    title: const Text("Sexe"),
+                    subtitle: Text(gender ?? "Non spécifié"),
+                    trailing: const Icon(Icons.arrow_drop_down),
+                    onTap: () => _changeGender(),
+                  ),
+                  ListTile(
+                    title: const Text("Photo de profil"),
+                    trailing: const Icon(Icons.camera_alt),
+                    onTap: () => _changeProfilePicture(),
                   ),
                 ],
               ),
-            ),
-            const Divider(thickness: 2),
-            ExpansionTile(
-              title: const Text("Info Personnelle"),
-              children: [
-                ListTile(
-                  title: const Text("Changer de prénom"),
-                  trailing: const Icon(Icons.edit),
-                  onTap: () => _changeUsername(),
-                ),
-                ListTile(
-                  title: const Text("Sexe"),
-                  subtitle: Text(gender ?? "Non spécifié"),
-                  trailing: const Icon(Icons.arrow_drop_down),
-                  onTap: () => _changeGender(),
-                ),
-                ListTile(
-                  title: const Text("Photo de profil"),
-                  trailing: const Icon(Icons.camera_alt),
-                  onTap: () => _changeProfilePicture(),
-                ),
-              ],
-            ),
-            ExpansionTile(
-              title: const Text("Sécurité"),
-              children: [
-                ListTile(
-                  title: const Text("Changer mot de passe"),
-                  trailing: const Icon(Icons.lock),
-                  onTap: () => _changePassword(),
-                ),
-                ListTile(
-                  title: const Text("Changer email"),
-                  trailing: const Icon(Icons.email),
-                  onTap: () => _changeEmail(),
-                ),
-              ],
-            ),
-            ExpansionTile(
-              title: const Text("Personnalisation"),
-              children: [
-                ListTile(
-                  title: const Text("Changer de thème"),
-                  trailing: const Icon(Icons.edit),
-                  onTap: () => _changeTheme(),
-                ),
-              ],
-            ),
-            ExpansionTile(
-              title: const Text("Zone de danger"),
-              children: [
-                ListTile(
-                  title: const Text("Déconnexion"),
-                  trailing: const Icon(Icons.logout),
-                  onTap: () => _logout(context),
-                ),
-                ListTile(
-                  title: const Text("Supprimer son compte"),
-                  trailing: const Icon(Icons.delete, color: Colors.red),
-                  onTap: () => _deleteAccount(),
-                ),
-              ],
-            ),
-          ],
+              ExpansionTile(
+                title: const Text("Sécurité"),
+                children: [
+                  ListTile(
+                    title: const Text("Changer mot de passe"),
+                    trailing: const Icon(Icons.lock),
+                    onTap: () => _changePassword(),
+                  ),
+                  ListTile(
+                    title: const Text("Changer email"),
+                    trailing: const Icon(Icons.email),
+                    onTap: () => _changeEmail(),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                title: const Text("Personnalisation"),
+                children: [
+                  ListTile(
+                    title: const Text("Changer de thème"),
+                    trailing: const Icon(Icons.edit),
+                    onTap: () => _changeTheme(),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                title: const Text("Zone de danger"),
+                children: [
+                  ListTile(
+                    title: const Text("Déconnexion"),
+                    trailing: const Icon(Icons.logout),
+                    onTap: () => _logout(context),
+                  ),
+                  ListTile(
+                    title: const Text("Supprimer son compte"),
+                    trailing: const Icon(Icons.delete, color: Colors.red),
+                    onTap: () => _deleteAccount(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      Future.microtask(() {
+        context.push('/login');
+      });
+      return const Center(
+        child: Text("ERROR"),
+      );
+    }
   }
 
   void _changeUsername() {
@@ -134,22 +141,22 @@ class _AccountParametersState extends State<AccountParameters> {
 
   void _logout(BuildContext context) async {
     try {
-      print("Début de la déconnexion...");
+      //Début de la déconnexion...
 
       await app_state.currentManager.forgetUser();
-      print("Utilisateur oublié localement.");
+      //"Utilisateur oublié localement.
 
       app_state.cachedAuthedUser.$ = null;
-      print("cachedAuthedUser effacé.");
+      //cachedAuthedUser effacé.
 
       await Future.delayed(Duration.zero);
 
       if (context.mounted) {
         context.go('/'); // Redirige vers l'écran de connexion (LoginScreen)
-        print("Redirection effectuée.");
+        //Redirection effectuée.
       }
     } catch (e) {
-      print("Erreur lors de la déconnexion : $e");
+      //Erreur lors de la déconnexion
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Déconnexion échouée : ${e.toString()}")),
       );
@@ -169,13 +176,11 @@ class _AccountParametersState extends State<AccountParameters> {
             children: [
               SimpleDialogOption(
                 child: const Text('Thème clair'),
-                onPressed: () {
-                },
+                onPressed: () {},
               ),
               SimpleDialogOption(
                 child: const Text('Thème sombre'),
-                onPressed: () {
-                },
+                onPressed: () {},
               ),
               // Add more themes as needed
             ],

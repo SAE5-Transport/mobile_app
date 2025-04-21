@@ -35,7 +35,7 @@ Future<void> main() async {
         darkTheme: DarkThemeData.darkThemeData,
         routerConfig: GoRouter(routes: [
           GoRoute(
-            path: '/',
+            path: '/login',
             builder: (context, state) => const LoginScreen(),
             redirect: (context, state) {
               final OidcUser? user = app_state.cachedAuthedUser.of(context);
@@ -43,11 +43,11 @@ Future<void> main() async {
               if (user == null) {
                 return null;
               }
-              return '/main';
+              return '/';
             },
           ),
           GoRoute(
-            path: '/main',
+            path: '/',
             builder: (context, state) => const MainScreen(),
           ),
         ]),

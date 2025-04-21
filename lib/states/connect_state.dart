@@ -1,5 +1,6 @@
 import 'package:async/async.dart';
 import 'package:bdaya_shared_value/bdaya_shared_value.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:logging/logging.dart';
 import 'package:oidc/oidc.dart';
 import 'package:oidc_default_store/oidc_default_store.dart';
@@ -37,6 +38,7 @@ final duendeManager = OidcUserManager.lazy(
 );
 
 final initMemoizer = AsyncMemoizer<void>();
+
 Future<void> initApp() async {
   await initMemoizer.runOnce(() async {
     currentManager.userChanges().listen((event) {
@@ -48,6 +50,13 @@ Future<void> initApp() async {
 
     await currentManager.init();
   });
+}
+
+bool isConnected(BuildContext? context) {
+  if(cachedAuthedUser.of(context) == null) {
+    return false;
+  }
+  return true;
 }
 
 final cachedAuthedUser = SharedValue<OidcUser?>(value: null);

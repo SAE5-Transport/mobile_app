@@ -1,13 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:mobile_app/scenes/main_screen.dart';
+import 'package:mobile_app/scenes/tabs/info-trafic/select_operator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
+  final MainScreenState parent;
+
   const Home({
     super.key,
+    required this.parent,
   });
 
   @override
@@ -21,7 +27,6 @@ class _HomeState extends State<Home> {
   final Location _location = Location();
 
   final List<Map<String, dynamic>> _favoriteAddresses = [];
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -56,6 +61,13 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Map<int, IconData> iconDataMap = {
+    0xe88a: Icons.home,
+    0xe84f: Icons.apartment,
+    0xe87d: Icons.favorite,
+    0xe7fd: Icons.person,
+  };
+
   Future<void> _loadFavorites() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? savedFavorites = prefs.getString('favorites');
@@ -65,7 +77,7 @@ class _HomeState extends State<Home> {
           json.decode(savedFavorites).map((item) => {
             'address': item['address'],
             'name': item['name'],
-            'icon': IconData(item['icon'], fontFamily: 'MaterialIcons'),
+            'icon': iconDataMap[item['icon']] ?? Icons.home,
             'color': Color(item['color'])
           })
         ));
@@ -128,27 +140,49 @@ class _HomeState extends State<Home> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
+                      // Remove Expanded and directly use the Container
+                      GestureDetector(
+                        onTap: () {
+                          // Open route search
+                          widget.parent.onItemTapped(1);
+                        },
                         child: Container(
+                          height: 50,
+                          alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: Colors.green.shade700,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: TextField(
-                            controller: _searchController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: const InputDecoration(
-                              hintText: 'Où souhaitez-vous aller ?',
-                              hintStyle: TextStyle(color: Colors.white70),
-                              border: InputBorder.none,
+                          child: const AutoSizeText(
+                            'Où souhaitez-vous aller ?',
+                            minFontSize: 6,
+                            maxFontSize: 18,
+                            style: TextStyle(
+                              color: Colors.white70,
                             ),
                           ),
                         ),
                       ),
+
+                      // Button to add a favorite address
                       IconButton(
                         icon: const Icon(Icons.add, color: Colors.white),
                         onPressed: _addFavoriteAddress,
+                      ),
+
+                      // Button for showing info trafic
+                      IconButton(
+                        icon: const Icon(Icons.warning, color: Colors.white),
+                        onPressed: () {
+                          // Show info trafic
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SelectOperatorInfoTrafic()
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

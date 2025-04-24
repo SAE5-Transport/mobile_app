@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:zstandard/zstandard.dart';
 
 String host = 'api.hexatransit.clarifygdps.com';
 
@@ -61,5 +63,29 @@ Future<Map<String, dynamic>> searchPaths(double departure_lat, double departure_
     return jsonDecode(response.body);
   } else {
     return {};
+  }
+}
+
+Future<List<Map<String, dynamic>>> getIncidentsOnLines(List<String> lines) async {
+  try {
+    var url = Uri.http(host, '/v1/search/incidentsOnLines', {'lineIds': lines, 'zstd': 'true'});
+    var response = await http.get(url, headers: {'Accept-Encoding': 'zstd'}).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      // Check if the response body is Zstandard-compressed
+        // Decode Zstandard response
+        Uint8List bytes = response.bodyBytes;
+        Zstandard decoder = Zstandard();
+        Uint8List? decompressed = await decoder.decompress(bytes);
+        String decodedBody = utf8.decode(decompressed!);
+
+        // Parse the JSON from the decompressed response
+        return List<Map<String, dynamic>>.from(jsonDecode(decodedBody)["lines"]);
+    } else {
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching incidents on lines: $e');
+    return [];
   }
 }

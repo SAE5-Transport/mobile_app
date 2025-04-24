@@ -9,18 +9,18 @@ class MainScreen extends StatefulWidget {
   });
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final ValueNotifier<Widget> _currentScreen = ValueNotifier<Widget>(const Home());
+  late final ValueNotifier<Widget> _currentScreen;
 
   void _selectScreen(int index) {
     switch (index) {
       case 0:
-        _currentScreen.value = const Home();
+        _currentScreen.value = Home(parent: this);
         break;
       case 1:
         _currentScreen.value = const RoutePage();
@@ -37,12 +37,18 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     _selectScreen(index);
 
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentScreen = ValueNotifier<Widget>(Home(parent: this));
   }
 
   @override
@@ -59,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type : BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
+        onTap: onItemTapped,
         backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
         selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
         unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,

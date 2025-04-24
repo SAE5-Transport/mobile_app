@@ -59,6 +59,11 @@ dependencies:
   intl: ^0.20.2
   sliding_up_panel: ^2.0.0+1
   flutter_launcher_icons: ^0.14.3
+  archive: ^4.0.5
+  zstandard: ^1.3.27
+  html: ^0.15.5+1
+  html_unescape: ^2.0.0
+  flutter_html: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -102,13 +107,19 @@ flutter:
 
   assets:
     - assets/data/
-    - assets/icons/
+    - assets/icons/transportMode/
+    - assets/icons/trafic/
+    - assets/logo/fr-idf/
     - assets/logo/fr-idf/metro/
     - assets/logo/fr-idf/rer/
     - assets/logo/fr-idf/tram/
     - assets/logo/fr-idf/transilien/
+    - assets/logo/fr-idf/cable/
     - assets/logo/fr-sncf-tgv/
     - assets/logo/fr-sncf-ter/
+    - assets/logo/fr-star/
+    - assets/logo/fr-star/metro/
+    - assets/logo/fr-star/bus/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

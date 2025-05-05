@@ -1,6 +1,7 @@
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_app/utils/functions.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -22,27 +23,48 @@ class HexColor extends Color {
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
 
-String? getMainTransportModeAsset(List<String> modes) {
+String? getMainTransportModeAsset(List<String> modes, BuildContext context) {
   String? topMode;
 
   // Get top mode from the list
-  if (modes.contains('BUS')) {
-    topMode = 'assets/icons/transportMode/bus.png';
-  }
-  if (modes.contains('TRAM')) {
-    topMode = 'assets/icons/transportMode/tram.png';
-  }
-  if (modes.contains('SUBWAY')) {
-    topMode = 'assets/icons/transportMode/metro.png';
-  }
-  if (modes.contains('RAIL')) {
-    topMode = 'assets/icons/transportMode/train.png';
-  }
-  if (modes.contains('CABLE_CAR')) {
-    topMode = 'assets/icons/transportMode/cable.png';
-  } 
-  if (modes.contains('FERRY')) {
-    topMode = 'assets/icons/transportMode/ferry.png';
+  if (isNightMode(context)) {
+    if (modes.contains('BUS')) {
+      topMode = 'assets/icons/transportMode/bus_white.png';
+    }
+    if (modes.contains('TRAM')) {
+      topMode = 'assets/icons/transportMode/tram_white.png';
+    }
+    if (modes.contains('SUBWAY')) {
+      topMode = 'assets/icons/transportMode/metro_white.png';
+    }
+    if (modes.contains('RAIL')) {
+      topMode = 'assets/icons/transportMode/train_white.png';
+    }
+    if (modes.contains('CABLE_CAR')) {
+      topMode = 'assets/icons/transportMode/cable_white.png';
+    } 
+    if (modes.contains('FERRY')) {
+      topMode = 'assets/icons/transportMode/ferry_white.png';
+    }
+  } else {
+    if (modes.contains('BUS')) {
+      topMode = 'assets/icons/transportMode/bus.png';
+    }
+    if (modes.contains('TRAM')) {
+      topMode = 'assets/icons/transportMode/tram.png';
+    }
+    if (modes.contains('SUBWAY')) {
+      topMode = 'assets/icons/transportMode/metro.png';
+    }
+    if (modes.contains('RAIL')) {
+      topMode = 'assets/icons/transportMode/train.png';
+    }
+    if (modes.contains('CABLE_CAR')) {
+      topMode = 'assets/icons/transportMode/cable.png';
+    } 
+    if (modes.contains('FERRY')) {
+      topMode = 'assets/icons/transportMode/ferry.png';
+    }
   }
 
   return topMode;
@@ -66,10 +88,12 @@ Future<Map<String, dynamic>> loadPriorityData() async {
   for (var row in csvTable) {
     String lineId = row[0];
     String picto = row[2];
-    bool isPriority = row[4] == '1';
+    bool isPriority = row[4] == 1;
+    bool darkMode = row[5] == 1;
     priorityMap[lineId] = {
       'picto': picto,
       'isPriority': isPriority,
+      'darkMode': darkMode,
     };
   }
   return priorityMap;
@@ -88,21 +112,25 @@ List<dynamic> sortLinesByGtfsRouteType(Map<String, Map<String, dynamic>> lines, 
       return -1;
     } else if (!isPriorityA && isPriorityB) {
       return 1;
-    } else {
+    } else if (orderA != orderB) {
       return orderA.compareTo(orderB);
+    } else {
+      return (a['shortName'] ?? '').compareTo(b['shortName'] ?? '');
     }
   });
   return linesList;
 }
 
-Future<Widget> getTransportIconFromPath(Map<String, dynamic> line) async {
+Future<Widget> getTransportIconFromPath(Map<String, dynamic> line, context, bool darkModeParam) async {
   Map<String, dynamic> priorityMap = await loadPriorityData();
 
   String lineId = line['gtfsId'];
 
   if (priorityMap[lineId] != null) {
+    String darkMode = isNightMode(context) && priorityMap[lineId]['darkMode'] && darkModeParam ? '_dark' : '';
+
     return Image.asset(
-      priorityMap[lineId]['picto'],
+      priorityMap[lineId]['picto'].replaceFirst('.png', '${darkMode}.png'),
       width: 24,
       height: 24,
     );
@@ -151,8 +179,9 @@ Future<Widget> getTransportIconFromPath(Map<String, dynamic> line) async {
   }
 }
 
-Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) async {
+Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData, BuildContext context, bool darkModeParam) async {
   List<Widget> icons = [];
+  List<String> linesIds = [];
   Map<String, dynamic> priorityMap = await loadPriorityData();
 
   List<dynamic> sortedLines = sortLinesByGtfsRouteType(linesData, priorityMap);
@@ -160,13 +189,19 @@ Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) asyn
   for (var line in sortedLines) {
     String lineId = line['gtfsId'];
 
+    if (linesIds.contains(lineId)) {
+      continue; // Skip if the line ID is already added
+    }
+
     // Check if an icon is available for this line
     if (priorityMap[lineId] != null) {
+      String darkMode = isNightMode(context) && priorityMap[lineId]['darkMode'] && darkModeParam ? '_dark' : '';
+
       icons.add(
         Padding(
           padding: const EdgeInsets.only(right: 4.0),
           child: Image.asset(
-            priorityMap[lineId]['picto'],
+            priorityMap[lineId]['picto'].replaceFirst('.png', '${darkMode}.png'),
             width: 24,
             height: 24,
           ),
@@ -180,7 +215,7 @@ Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) asyn
           child: Container(
             height: 24,
             decoration: BoxDecoration(
-              color: HexColor(line['color']),
+              color: line['color'] != null ? HexColor(line['color']) : Colors.black,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -188,7 +223,7 @@ Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData) asyn
               child: Text(
                 line['shortName'],
                 style: TextStyle(
-                  color: HexColor(line['textColor']),
+                  color: line['textColor'] != null ? HexColor(line['textColor']) : Colors.white,
                   fontSize: 12,
                 ),
               ),

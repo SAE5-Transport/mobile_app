@@ -1,4 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+bool isNightMode(BuildContext context) {
+  return Theme.of(context).brightness == Brightness.dark;
+}
 
 double convertSecondsToMinutes(double seconds) {
   return seconds / 60;

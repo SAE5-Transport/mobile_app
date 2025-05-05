@@ -84,7 +84,7 @@ class _RoutePageState extends State<RoutePage> {
       for (var leg in path["legs"]) {
         // Show lines icons
         if (leg["route"] != null) {
-          linesIcons.add(await getTransportIconFromPath(leg["route"]));
+          linesIcons.add(await getTransportIconFromPath(leg["route"], context, false));
 
           // Add a separator
           linesIcons.add(
@@ -443,7 +443,7 @@ class _RoutePageState extends State<RoutePage> {
                                     }
 
                                     // Get the icon for the transport mode
-                                    String? modeTop = getMainTransportModeAsset(modes);
+                                    String? modeTop = getMainTransportModeAsset(modes, context);
                                     leading = modeTop != null ? Image.asset(
                                       modeTop,
                                       width: 36,
@@ -452,7 +452,7 @@ class _RoutePageState extends State<RoutePage> {
 
                                     // Get lines icons
                                     subtitle = FutureBuilder(
-                                      future: getTransportsIcons(linesData),
+                                      future: getTransportsIcons(linesData, context, true),
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState == ConnectionState.done) {
                                           if (snapshot.hasData && snapshot.data != null) {
@@ -466,7 +466,7 @@ class _RoutePageState extends State<RoutePage> {
                                               child: snapshot.data!,
                                             );
                                           } else {
-                                            return const Text('No data available');
+                                            return Container();
                                           }
                                         } else if (snapshot.hasError) {
                                           print(snapshot.error);
@@ -626,7 +626,7 @@ class _RoutePageState extends State<RoutePage> {
                                     }
 
                                     // Get the icon for the transport mode
-                                    String? modeTop = getMainTransportModeAsset(modes);
+                                    String? modeTop = getMainTransportModeAsset(modes, context);
                                     leading = modeTop != null ? Image.asset(
                                       modeTop,
                                       width: 36,
@@ -635,7 +635,7 @@ class _RoutePageState extends State<RoutePage> {
 
                                     // Get lines icons
                                     subtitle = FutureBuilder(
-                                      future: getTransportsIcons(linesData),
+                                      future: getTransportsIcons(linesData, context, true),
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState == ConnectionState.done) {
                                           if (snapshot.hasData && snapshot.data != null) {

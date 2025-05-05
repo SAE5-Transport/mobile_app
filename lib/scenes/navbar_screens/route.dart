@@ -10,6 +10,7 @@ import 'package:mobile_app/api/hexatransit_api.dart';
 import 'package:mobile_app/scenes/tabs/path_map.dart';
 import 'package:mobile_app/utils/assets.dart';
 import 'package:mobile_app/utils/functions.dart';
+import 'package:mobile_app/utils/geolocator.dart';
 import 'package:scroll_loop_auto_scroll/scroll_loop_auto_scroll.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -146,7 +147,7 @@ class _RoutePageState extends State<RoutePage> {
                   children: [
                     // Lines
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.55, // Adjust the width as needed
+                      width: MediaQuery.of(context).size.width * 0.52, // Adjust the width as needed
                       child: Wrap(
                         runSpacing: 4,
                         crossAxisAlignment: WrapCrossAlignment.center,
@@ -156,7 +157,12 @@ class _RoutePageState extends State<RoutePage> {
 
                     Flexible(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          const SizedBox(
+                            width: 10,
+                          ),
+
                           // Price
                           Text(
                             price != null ? "${price.toStringAsFixed(2)} €" : "",
@@ -418,14 +424,35 @@ class _RoutePageState extends State<RoutePage> {
                                 controller: startController,
                                 suggestionsController: startSuggestionsController,
                                 suggestionsCallback: (search) async {
-                                  // Fetch suggestions from the server
-                                  List<Map<String, dynamic>> suggestions = await getLocations(search);
+                                  if (search.isNotEmpty) {
+                                    // Fetch suggestions from the server
+                                    List<Map<String, dynamic>> suggestions = await getLocations(search);
 
-                                  return suggestions;
+                                    return suggestions;
+                                  } else {
+                                    // Return GPS position of the phone
+                                    return [
+                                      {
+                                        "type": "gps",
+                                        "name": "Position GPS",
+                                      }
+                                    ];
+                                  }
                                 },
                                 itemBuilder: (context, suggestion) {
                                   dynamic leading;
                                   dynamic subtitle;
+
+                                  // Check if the suggestion is a GPS position
+                                  if (suggestion["type"] != null && suggestion["type"] == "gps") {
+                                    leading = const Icon(Icons.gps_fixed);
+
+                                    return ListTile(
+                                      leading: leading,
+                                      title: const Text("Position GPS")
+                                    );
+                                  }
+
                                   if (suggestion.containsKey("stops")) {
                                     List<String> modes = [];
                                     Map<String, Map<String, dynamic>> linesData = {};
@@ -504,10 +531,22 @@ class _RoutePageState extends State<RoutePage> {
                                 },
                                 onSelected: (value) {
                                   startController.text = value["name"];
-                                  startLocation = {
-                                    "lat": double.parse(value["lat"].toString()),
-                                    "lon": double.parse(value["lon"].toString())
-                                  };
+
+                                  // Check if the suggestion is a GPS position
+                                  if (value["type"] != null && value["type"] == "gps") {
+                                    // Get the GPS position
+                                    getCurrentLocation().then((location) {
+                                      startLocation = {
+                                        "lat": location.latitude,
+                                        "lon": location.longitude
+                                      };
+                                    });
+                                  } else {
+                                    startLocation = {
+                                      "lat": double.parse(value["lat"].toString()),
+                                      "lon": double.parse(value["lon"].toString())
+                                    };
+                                  }
 
                                   // Close suggestion (retain focus)
                                   startSuggestionsController.close(retainFocus: false);
@@ -538,7 +577,7 @@ class _RoutePageState extends State<RoutePage> {
                                     child: child,
                                   );
                                 },
-                                hideOnEmpty: true,
+                                hideOnEmpty: false,
                                 hideOnError: true,
                                 builder: (context, controller, focusNode) {
                                   return TextField(
@@ -601,14 +640,35 @@ class _RoutePageState extends State<RoutePage> {
                                 controller: endController,
                                 suggestionsController: endSuggestionsController,
                                 suggestionsCallback: (search) async {
-                                  // Fetch suggestions from the server
-                                  List<Map<String, dynamic>> suggestions = await getLocations(search);
+                                  if (search.isNotEmpty) {
+                                    // Fetch suggestions from the server
+                                    List<Map<String, dynamic>> suggestions = await getLocations(search);
 
-                                  return suggestions;
+                                    return suggestions;
+                                  } else {
+                                    // Return GPS position of the phone
+                                    return [
+                                      {
+                                        "type": "gps",
+                                        "name": "Position GPS",
+                                      }
+                                    ];
+                                  }
                                 },
                                 itemBuilder: (context, suggestion) {
                                   dynamic leading;
                                   dynamic subtitle;
+
+                                  // Check if the suggestion is a GPS position
+                                  if (suggestion["type"] != null && suggestion["type"] == "gps") {
+                                    leading = const Icon(Icons.gps_fixed);
+
+                                    return ListTile(
+                                      leading: leading,
+                                      title: const Text("Position GPS")
+                                    );
+                                  }
+
                                   if (suggestion.containsKey("stops")) {
                                     List<String> modes = [];
                                     Map<String, Map<String, dynamic>> linesData = {};
@@ -687,10 +747,22 @@ class _RoutePageState extends State<RoutePage> {
                                 },
                                 onSelected: (value) {
                                   endController.text = value["name"];
-                                  endLocation = {
-                                    "lat": double.parse(value["lat"].toString()),
-                                    "lon": double.parse(value["lon"].toString())
-                                  };
+
+                                  // Check if the suggestion is a GPS position
+                                  if (value["type"] != null && value["type"] == "gps") {
+                                    // Get the GPS position
+                                    getCurrentLocation().then((location) {
+                                      endLocation = {
+                                        "lat": location.latitude,
+                                        "lon": location.longitude
+                                      };
+                                    });
+                                  } else {
+                                    endLocation = {
+                                      "lat": double.parse(value["lat"].toString()),
+                                      "lon": double.parse(value["lon"].toString())
+                                    };
+                                  }
 
                                   // Close suggestion (retain focus)
                                   endSuggestionsController.close(retainFocus: false);
@@ -721,7 +793,7 @@ class _RoutePageState extends State<RoutePage> {
                                     child: child,
                                   );
                                 },
-                                hideOnEmpty: true,
+                                hideOnEmpty: false,
                                 hideOnError: true,
                                 builder: (context, controller, focusNode) {
                                   return TextField(

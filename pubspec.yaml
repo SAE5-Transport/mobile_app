@@ -64,6 +64,7 @@ dependencies:
   html: ^0.15.5+1
   html_unescape: ^2.0.0
   flutter_html: ^3.0.0
+  geolocator: ^14.0.0
 
 dev_dependencies:
   flutter_test:

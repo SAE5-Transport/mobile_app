@@ -37,7 +37,7 @@ class _PathMapState extends State<PathMap> {
 
     LatLngBounds bounds = calculateBounds(coordinates);
     _controller.future.then((controller) {
-      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
     });
   }
 

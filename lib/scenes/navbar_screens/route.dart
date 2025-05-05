@@ -72,12 +72,17 @@ class _RoutePageState extends State<RoutePage> {
   Future<List<Widget>> buildPathButtons(Map<String, dynamic> data) async {
     List<Widget> buttons = [];
 
+    // Get tickets infos
+    List<Map<String, dynamic>> tickets = await getTickets();
+
     for (var path in data["planConnection"]["edges"]) {
       List<Widget> linesIcons = [];
+      List<Map<String, dynamic>> products = [];
 
       path = path["node"];
 
       for (var leg in path["legs"]) {
+        // Show lines icons
         if (leg["route"] != null) {
           linesIcons.add(await getTransportIconFromPath(leg["route"]));
 
@@ -91,6 +96,22 @@ class _RoutePageState extends State<RoutePage> {
               )
             )
           );
+        }
+
+        // Get the products
+        products.addAll((leg["fareProducts"] as List).cast<Map<String, dynamic>>());
+      }
+      
+      double? price;
+      for (var ticket in tickets) {
+        for (var product in products) {
+          if (product["product"]["id"] == ticket["fareId"]) {
+            if (price == null) {
+              price = ticket["price"];
+            } else {
+              price = price + ticket["price"];
+            }
+          }
         }
       }
 
@@ -125,7 +146,7 @@ class _RoutePageState extends State<RoutePage> {
                   children: [
                     // Lines
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.6, // Adjust the width as needed
+                      width: MediaQuery.of(context).size.width * 0.55, // Adjust the width as needed
                       child: Wrap(
                         runSpacing: 4,
                         crossAxisAlignment: WrapCrossAlignment.center,
@@ -133,15 +154,29 @@ class _RoutePageState extends State<RoutePage> {
                       ),
                     ),
 
-                    // Duration
                     Flexible(
-                      child: Text(
-                        "${convertSecondsToMinutes(double.parse(path["duration"].toString())).floor().toString()} min",
-                        style: GoogleFonts.nunito(
-                          fontSize: 18
-                        ),
+                      child: Row(
+                        children: [
+                          // Price
+                          Text(
+                            price != null ? "${price.toStringAsFixed(2)} €" : "",
+                            style: GoogleFonts.nunito(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: const Color.fromARGB(255, 255, 178, 11),
+                            ),
+                          ),
+
+                          // Duration
+                          Text(
+                            "${convertSecondsToMinutes(double.parse(path["duration"].toString())).floor().toString()} min",
+                            style: GoogleFonts.nunito(
+                              fontSize: 18
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    )
                   ],
                 ),
 

@@ -98,7 +98,7 @@ List<dynamic> sortLinesByGtfsRouteType(Map<String, Map<String, dynamic>> lines, 
 Future<Widget> getTransportIconFromPath(Map<String, dynamic> line) async {
   Map<String, dynamic> priorityMap = await loadPriorityData();
 
-  String lineId = line['id'];
+  String lineId = line['gtfsId'];
 
   if (priorityMap[lineId] != null) {
     return Image.asset(
@@ -129,17 +129,17 @@ Future<Widget> getTransportIconFromPath(Map<String, dynamic> line) async {
           Container(
             height: 24,
             decoration: BoxDecoration(
-              color: HexColor(line['presentation']['colour'] ?? '#000000'),
+              color: HexColor(line['color'] ?? '#000000'),
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Center(
               child: Text(
-                line['publicCode'],
+                line['shortName'],
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: HexColor(line['presentation']['textColour'] ?? '#FFFFFF'),
+                  color: HexColor(line['textColor'] ?? '#FFFFFF'),
                   fontSize: 12,
                 ),
               ),

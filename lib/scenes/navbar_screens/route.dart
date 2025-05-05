@@ -72,12 +72,14 @@ class _RoutePageState extends State<RoutePage> {
   Future<List<Widget>> buildPathButtons(Map<String, dynamic> data) async {
     List<Widget> buttons = [];
 
-    for (var path in data["trip"]["tripPatterns"]) {
+    for (var path in data["planConnection"]["edges"]) {
       List<Widget> linesIcons = [];
 
+      path = path["node"];
+
       for (var leg in path["legs"]) {
-        if (leg["line"] != null) {
-          linesIcons.add(await getTransportIconFromPath(leg["line"]));
+        if (leg["route"] != null) {
+          linesIcons.add(await getTransportIconFromPath(leg["route"]));
 
           // Add a separator
           linesIcons.add(
@@ -95,7 +97,6 @@ class _RoutePageState extends State<RoutePage> {
       // Remove the last separator
       if (linesIcons.isNotEmpty) {
         linesIcons.removeLast();
-      
 
         buttons.add(
           ElevatedButton(
@@ -152,7 +153,7 @@ class _RoutePageState extends State<RoutePage> {
                   children: [
                     // Start
                     Text(
-                      "${DateTime.parse(path["expectedStartTime"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(path["expectedStartTime"]).toLocal().minute.toString().padLeft(2, '0')}",
+                      "${DateTime.parse(path["start"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(path["start"]).toLocal().minute.toString().padLeft(2, '0')}",
                       style: GoogleFonts.nunito(
                         fontSize: 18
                       ),
@@ -166,7 +167,7 @@ class _RoutePageState extends State<RoutePage> {
                       ),
                       padding: const EdgeInsets.all(4.0),
                       child: Text(
-                        "Arrivé à ${DateTime.parse(path["expectedEndTime"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(path["expectedEndTime"]).toLocal().minute.toString().padLeft(2, '0')}",
+                        "Arrivé à ${DateTime.parse(path["end"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(path["end"]).toLocal().minute.toString().padLeft(2, '0')}",
                         style: GoogleFonts.nunito(
                           fontSize: 14,
                           color: const Color.fromARGB(255, 11, 88, 255),

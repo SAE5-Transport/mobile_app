@@ -56,8 +56,8 @@ class _PathMapState extends State<PathMap> {
         )
       );
 
-      if (leg["line"] != null) {
-        transportIcons.add(await getTransportIconFromPath(leg["line"]));
+      if (leg["route"] != null) {
+        transportIcons.add(await getTransportIconFromPath(leg["route"]));
       } else {
         transportIcons.add(
           Row(
@@ -95,12 +95,12 @@ class _PathMapState extends State<PathMap> {
     
     // Add polylines to the map
     for (var leg in widget.pathData['legs']) {
-      List<LatLng> points = decodePolyline(leg['pointsOnLink']['points']);
-      Map<String, dynamic>? line = leg['line'];
-      String color = line != null ? (line['presentation']['colour'] ?? '#000000') : '#000000';
+      List<LatLng> points = decodePolyline(leg['legGeometry']['points']);
+      Map<String, dynamic>? line = leg['route'];
+      String color = line != null ? (line['color'] ?? '#000000') : '#000000';
 
       Polyline polyline = Polyline(
-        polylineId: PolylineId(leg['pointsOnLink']['points']),
+        polylineId: PolylineId(leg['legGeometry']['points']),
         color: HexColor(color),
         points: points,
         width: 5,

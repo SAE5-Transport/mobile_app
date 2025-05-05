@@ -37,7 +37,7 @@ class _PathMapState extends State<PathMap> {
 
     LatLngBounds bounds = calculateBounds(coordinates);
     _controller.future.then((controller) {
-      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
     });
   }
 
@@ -52,6 +52,7 @@ class _PathMapState extends State<PathMap> {
           child: Icon(
             Icons.circle,
             size: 4,
+            color: Colors.black,
           )
         )
       );
@@ -66,6 +67,7 @@ class _PathMapState extends State<PathMap> {
               const Icon(
                 Icons.directions_walk,
                 size: 24,
+                color: Colors.black,
               ),
 
               Text(
@@ -195,8 +197,8 @@ class _PathMapState extends State<PathMap> {
             ),
 
             SlidingUpPanel(
-              maxHeight: MediaQuery.of(context).size.height * 0.5,
-              minHeight: MediaQuery.of(context).size.height * 0.1,
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
+              minHeight: MediaQuery.of(context).size.height * 0.12,
               color: Colors.grey[300] ?? Colors.grey,
               onPanelSlide: (double position) {
                 _mapHeightFactor.value = (0.9 - (position * 0.4)).clamp(0.1, 0.9);

@@ -78,6 +78,7 @@ class _TransportStepState extends State<TransportStep> {
           const Icon(
             Icons.location_pin,
             size: 40,
+            color: Colors.black
           ),
 
           const SizedBox(width: 8),
@@ -88,7 +89,8 @@ class _TransportStepState extends State<TransportStep> {
               Text(
                 "Départ",
                 style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black
                 ),
               ),
 
@@ -98,6 +100,7 @@ class _TransportStepState extends State<TransportStep> {
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
+                  color: Colors.black
                 ),
               )
             ],
@@ -127,6 +130,7 @@ class _TransportStepState extends State<TransportStep> {
           style: GoogleFonts.nunito(
             fontWeight: FontWeight.bold,
             fontSize: 20,
+            color: Colors.black
           ),
         );
       }
@@ -177,6 +181,7 @@ class _TransportStepState extends State<TransportStep> {
                 child: const Icon(
                   Icons.directions_walk,
                   size: 40,
+                  color: Colors.black
                 ),
               ),
               Expanded(
@@ -239,6 +244,7 @@ class _TransportStepState extends State<TransportStep> {
                 child: const Icon(
                   Icons.directions_walk,
                   size: 40,
+                  color: Colors.black
                 ),
               ),
               Expanded(
@@ -357,12 +363,10 @@ class _TransportStepState extends State<TransportStep> {
         lineDrawing = Stack(
           alignment: Alignment.center,
           children: [
-            Expanded(
-              child: CustomPaint(
-                size: const Size(8, double.infinity),
-                painter: HorizontalLinePainter(
-                  color: HexColor(leg["route"]["color"] ?? "#000000"),
-                ),
+            CustomPaint(
+              size: const Size(8, double.infinity),
+              painter: HorizontalLinePainter(
+                color: HexColor(leg["route"]["color"] ?? "#000000"),
               ),
             ),
           ],
@@ -397,6 +401,7 @@ class _TransportStepState extends State<TransportStep> {
           const Icon(
             Icons.location_pin,
             size: 40,
+            color: Colors.black
           ),
 
           const SizedBox(width: 8),
@@ -407,7 +412,8 @@ class _TransportStepState extends State<TransportStep> {
               Text(
                 "Arrivée",
                 style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black
                 ),
               ),
 
@@ -417,6 +423,7 @@ class _TransportStepState extends State<TransportStep> {
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
+                  color: Colors.black
                 ),
               )
             ],

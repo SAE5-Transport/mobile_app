@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 
 bool isNightMode(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark;
@@ -52,4 +53,12 @@ LatLngBounds calculateBounds(List<LatLng> points) {
     southwest: LatLng(minLat, minLng),
     northeast: LatLng(maxLat, maxLng),
   );
+}
+
+void prettyPrintJson(Map input) {
+  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+
+  var prettyString = encoder.convert(input);
+  // ignore: avoid_print
+  prettyString.split('\n').forEach((element) => print(element));
 }

@@ -3,16 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mobile_app/scenes/tabs/path/transport_step.dart';
 import 'package:mobile_app/utils/assets.dart';
 import 'package:mobile_app/utils/functions.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class PathMap extends StatefulWidget {
   final Map<String, dynamic> pathData;
+  final String startName;
+  final String endName;
 
   const PathMap({
     super.key,
     required this.pathData,
+    required this.startName,
+    required this.endName,
   });
 
   @override
@@ -209,6 +214,9 @@ class _PathMapState extends State<PathMap> {
                   // Lines and duration
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height * 0.12,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,6 +259,16 @@ class _PathMapState extends State<PathMap> {
                       ],
                     )
                   ),
+
+                  // Steps
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.48,
+                    child: TransportStep(
+                      pathData: widget.pathData,
+                      startName: widget.startName,
+                      endName: widget.endName,
+                    )
+                  )
                 ],
               )
             ),

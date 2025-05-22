@@ -239,6 +239,71 @@ Future<Row> getTransportsIcons(Map<String, Map<String, dynamic>> linesData, Buil
   );
 }
 
+Future<Widget> getLineLogo(Map<String, dynamic> lineData, BuildContext context) async {
+  Map<String, dynamic>? route = lineData['route'];
+
+  if (route == null) {
+    return Container();
+  }
+
+  Map<String, dynamic> priorityMap = await loadPriorityData();
+  String lineId = route['gtfsId'];
+
+  if (priorityMap[lineId] != null) {
+    // ignore: use_build_context_synchronously
+    String darkMode = isNightMode(context) && priorityMap[lineId]['darkMode'] ? '_dark' : '';
+
+    return Image.asset(
+      priorityMap[lineId]['picto'].replaceFirst('.png', '$darkMode.png'),
+      width: 30,
+      height: 30,
+    );
+  } else {
+    Widget iconPlus = Container();
+
+    if (lineId.contains("fr-sncf-tgv")) {
+      iconPlus = Image.asset(
+        'assets/logo/fr-sncf-tgv/logo.png',
+        height: 38,
+        width: 48,
+      );
+    } else if (lineId.contains("fr-sncf-ter")) {
+      iconPlus = Image.asset(
+        'assets/logo/fr-sncf-ter/logo.png',
+        height: 38,
+        width: 36,
+      );
+    }
+
+    return IntrinsicWidth(
+      child: Row(
+        children: [
+          iconPlus,
+          Container(
+            height: 30,
+            decoration: BoxDecoration(
+              color: HexColor(route['color'] ?? '#000000'),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Center(
+              child: Text(
+                route['shortName'],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: HexColor(route['textColor'] ?? '#FFFFFF'),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+        ],
+      )
+    );
+  }
+}
+
 Map<String, dynamic> getLineLogoWithPerturbation(List<Map<String, dynamic>> alerts, String lineId, String lineLogo, bool? isDisabled, BuildContext context) {
   Map<String, dynamic> lineData = {};
   

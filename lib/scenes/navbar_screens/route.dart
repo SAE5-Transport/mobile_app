@@ -129,6 +129,8 @@ class _RoutePageState extends State<RoutePage> {
                 MaterialPageRoute(
                   builder: (context) => PathMap(
                     pathData: path,
+                    startName: startController.text,
+                    endName: endController.text,
                   )
                 )
               );
@@ -577,7 +579,7 @@ class _RoutePageState extends State<RoutePage> {
                                     child: child,
                                   );
                                 },
-                                hideOnEmpty: false,
+                                hideOnEmpty: true,
                                 hideOnError: true,
                                 builder: (context, controller, focusNode) {
                                   return TextField(
@@ -793,7 +795,7 @@ class _RoutePageState extends State<RoutePage> {
                                     child: child,
                                   );
                                 },
-                                hideOnEmpty: false,
+                                hideOnEmpty: true,
                                 hideOnError: true,
                                 builder: (context, controller, focusNode) {
                                   return TextField(

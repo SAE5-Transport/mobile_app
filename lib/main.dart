@@ -1,5 +1,6 @@
 import 'package:bdaya_shared_value/bdaya_shared_value.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:mobile_app/assets/themes/dark_theme__data.dart';
@@ -14,6 +15,10 @@ import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   // init intl
   await findSystemLocale();

@@ -15,7 +15,6 @@ import path_provider_foundation
 import shared_preferences_foundation
 import url_launcher_macos
 import window_to_front
-import zstandard_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterAppauthPlugin.register(with: registry.registrar(forPlugin: "FlutterAppauthPlugin"))
@@ -28,5 +27,4 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
   UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
   WindowToFrontPlugin.register(with: registry.registrar(forPlugin: "WindowToFrontPlugin"))
-  ZstandardMacosPlugin.register(with: registry.registrar(forPlugin: "ZstandardMacosPlugin"))
 }

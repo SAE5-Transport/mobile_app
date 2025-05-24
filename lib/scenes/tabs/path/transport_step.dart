@@ -96,7 +96,7 @@ class _TransportStepState extends State<TransportStep> {
 
               Text(
                 // Show hour & end name
-                "${DateTime.parse(widget.pathData["start"]).hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["start"]).minute.toString().padLeft(2, '0')} - ${widget.startName}",
+                "${DateTime.parse(widget.pathData["start"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["start"]).toLocal().minute.toString().padLeft(2, '0')} - ${widget.startName}",
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -111,13 +111,13 @@ class _TransportStepState extends State<TransportStep> {
 
     int legIndex = 0;
     for (var leg in widget.pathData['legs']) {
-      DateTime scheduledStart = DateTime.parse(leg["start"]["scheduledTime"]);
-      DateTime scheduledEnd = DateTime.parse(leg["end"]["scheduledTime"]);
+      DateTime scheduledStart = DateTime.parse(leg["start"]["scheduledTime"]).toLocal();
+      DateTime scheduledEnd = DateTime.parse(leg["end"]["scheduledTime"]).toLocal();
       DateTime? estimatedStart = (leg["start"]["estimated"] != null)
-          ? DateTime.parse(leg["start"]["estimated"]['time'])
+          ? DateTime.parse(leg["start"]["estimated"]['time']).toLocal()
           : null;
       DateTime? estimatedEnd = (leg["end"]["estimated"] != null)
-          ? DateTime.parse(leg["end"]["estimated"]['time'])
+          ? DateTime.parse(leg["end"]["estimated"]['time']).toLocal()
           : null;
 
       Widget? lineDrawing;
@@ -419,7 +419,7 @@ class _TransportStepState extends State<TransportStep> {
 
               Text(
                 // Show hour & end name
-                "${DateTime.parse(widget.pathData["end"]).hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["end"]).minute.toString().padLeft(2, '0')} - ${widget.endName}",
+                "${DateTime.parse(widget.pathData["end"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["end"]).toLocal().minute.toString().padLeft(2, '0')} - ${widget.endName}",
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,

@@ -39,7 +39,7 @@ class _RoutePageState extends State<RoutePage> {
 
   Map<String, dynamic> startLocation = {};
   Map<String, dynamic> endLocation = {};
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime.now().toLocal();
   bool arrivingDate = false;
 
   bool lookingForStart = true;
@@ -870,12 +870,12 @@ class _RoutePageState extends State<RoutePage> {
                                   filled: true,
                                 ),
                                 style: Theme.of(context).textTheme.displayLarge,
-                                initialPickerDateTime: DateTime.now(),
+                                initialPickerDateTime: DateTime.now().toLocal(),
                                 initialValue: selectedDate,
                                 onChanged: (value) {
                                   if (value != null) {
                                     setState(() {
-                                      selectedDate = value;
+                                      selectedDate = value.toLocal();
                                     });
                                   }
                                 },

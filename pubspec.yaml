@@ -108,6 +108,7 @@ flutter:
 
   assets:
     - assets/data/
+    - assets/map_styles/
     - assets/icons/transportMode/
     - assets/icons/trafic/
     - assets/logo/fr-idf/

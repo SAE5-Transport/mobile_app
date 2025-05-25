@@ -96,6 +96,28 @@ Future<List<Map<String, dynamic>>> getIncidentsOnLines(List<String> lines) async
   }
 }
 
+Future<Map<String, dynamic>> getNextDepartureByStation(String id, DateTime startTime, int numOfDepartures, int numberOfDeparturesPerLineAndDestinationDisplay, bool includeCancelled) {
+  var url = Uri.http(
+    host,
+    '/v1/search/nextDepartureByStation',
+    {
+      'id': id,
+      'startTime': startTime.toIso8601String().replaceFirst('Z', ''),
+      'numOfDepartures': numOfDepartures.toString(),
+      'numberOfDeparturesPerLineAndDestinationDisplay': numberOfDeparturesPerLineAndDestinationDisplay.toString(),
+      'includeCancelled': includeCancelled.toString(),
+    },
+  );
+
+  return http.get(url).timeout(const Duration(seconds: 30)).then((response) {
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return {};
+    }
+  });
+}
+
 Future<List<Map<String, dynamic>>> getTickets() async {
   var url = Uri.http(host, '/v1/search/tickets');
   var response = await http.get(url).timeout(const Duration(seconds: 30));

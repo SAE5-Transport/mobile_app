@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile_app/scenes/tabs/path/transport_step.dart';
@@ -46,18 +47,27 @@ class _PathMapState extends State<PathMap> {
     });
   }
 
+  ValueNotifier<String> mapStyle = ValueNotifier<String>('');
+  void _loadMapStyle() async {
+    if (Theme.of(context).brightness == Brightness.dark) {
+      mapStyle.value = await rootBundle.loadString('assets/map_styles/dark.json');
+    } else {
+      mapStyle.value = await rootBundle.loadString('assets/map_styles/light.json');
+    }
+  }
+
   Future<List<Widget>> buildTransportIcons() async {
     List<Widget> transportIcons = [];
 
     for (var leg in widget.pathData['legs']) {
       // Add a separator
       transportIcons.add(
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 4.0),
           child: Icon(
             Icons.circle,
             size: 4,
-            color: Colors.black,
+            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black,
           )
         )
       );
@@ -69,10 +79,10 @@ class _PathMapState extends State<PathMap> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.directions_walk,
                 size: 24,
-                color: Colors.black,
+                color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
               ),
 
               Text(
@@ -81,7 +91,7 @@ class _PathMapState extends State<PathMap> {
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
-                  color: Colors.black
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 )
               )
             ],
@@ -137,6 +147,8 @@ class _PathMapState extends State<PathMap> {
 
   @override
   Widget build(BuildContext context) {
+    _loadMapStyle();
+
     return Material(
       type: MaterialType.transparency,
       child: SafeArea(
@@ -146,27 +158,33 @@ class _PathMapState extends State<PathMap> {
             Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
-              color: Colors.grey[300] ?? Colors.grey,
+              color: Theme.of(context).colorScheme.surface,
             ),
 
             ValueListenableBuilder<double>(
               valueListenable: _mapHeightFactor,
               builder: (context, value, child) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * value,
-                  width: MediaQuery.of(context).size.width,
-                  child: GoogleMap(
-                    mapType: MapType.normal,
-                    initialCameraPosition: _kGooglePlex,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                      _zoomToFitPolygon();
-                    },
-                    polylines: polylines,
-                    markers: markers,
-                  ),
+                return ValueListenableBuilder(
+                  valueListenable: mapStyle,
+                  builder: (context, style, child) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * value,
+                      width: MediaQuery.of(context).size.width,
+                      child: GoogleMap(
+                        mapType: MapType.normal,
+                        initialCameraPosition: _kGooglePlex,
+                        onMapCreated: (GoogleMapController controller) async {
+                          _controller.complete(controller);
+                          _zoomToFitPolygon();
+                        },
+                        polylines: polylines,
+                        markers: markers,
+                        style: mapStyle.value.isNotEmpty ? mapStyle.value : null,
+                      ),
+                    );
+                  }
                 );
-              },
+              }
             ),
 
             // Button return
@@ -175,9 +193,11 @@ class _PathMapState extends State<PathMap> {
               left: 16,
               child: IconButton.filled(
                 icon: const Icon(Icons.arrow_back),
-                color: Colors.black,
+                color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black,
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(Colors.white),
+                  backgroundColor: WidgetStateProperty.all(
+                    Theme.of(context).colorScheme.surface,
+                  ),
                   shape: WidgetStateProperty.all(const CircleBorder()),
                 ),
                 onPressed: () {
@@ -192,9 +212,11 @@ class _PathMapState extends State<PathMap> {
               right: 16,
               child: IconButton.filled(
                 icon: const Icon(Icons.bookmark_border),
-                color: Colors.black,
+                color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black,
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(Colors.white),
+                  backgroundColor: WidgetStateProperty.all(
+                    Theme.of(context).colorScheme.surface,
+                  ),
                   shape: WidgetStateProperty.all(const CircleBorder()),
                 ),
                 onPressed: () {}
@@ -204,7 +226,7 @@ class _PathMapState extends State<PathMap> {
             SlidingUpPanel(
               maxHeight: MediaQuery.of(context).size.height * 0.6,
               minHeight: MediaQuery.of(context).size.height * 0.12,
-              color: Colors.grey[300] ?? Colors.grey,
+              color: Theme.of(context).colorScheme.surface,
               onPanelSlide: (double position) {
                 _mapHeightFactor.value = (0.9 - (position * 0.4)).clamp(0.1, 0.9);
               },
@@ -216,6 +238,9 @@ class _PathMapState extends State<PathMap> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     constraints: BoxConstraints(
                       minHeight: MediaQuery.of(context).size.height * 0.12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -252,7 +277,7 @@ class _PathMapState extends State<PathMap> {
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               fontStyle: FontStyle.normal,
-                              color: Colors.black
+                              color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                             ),
                           ),
                         ),
@@ -261,8 +286,11 @@ class _PathMapState extends State<PathMap> {
                   ),
 
                   // Steps
-                  SizedBox(
+                  Container(
                     height: MediaQuery.of(context).size.height * 0.48,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
                     child: TransportStep(
                       pathData: widget.pathData,
                       startName: widget.startName,

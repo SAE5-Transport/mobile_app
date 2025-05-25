@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -67,6 +68,15 @@ class _RoutePageState extends State<RoutePage> {
         width: 5,
         patterns: [PatternItem.dot, PatternItem.gap(10)], // Add pattern for dotted line
       ));
+    }
+  }
+
+  ValueNotifier<String> mapStyle = ValueNotifier<String>('');
+  void _loadMapStyle() async {
+    if (Theme.of(context).brightness == Brightness.dark) {
+      mapStyle.value = await rootBundle.loadString('assets/map_styles/dark.json');
+    } else {
+      mapStyle.value = await rootBundle.loadString('assets/map_styles/light.json');
     }
   }
 
@@ -231,100 +241,108 @@ class _RoutePageState extends State<RoutePage> {
 
   @override
   Widget build(BuildContext context) {
+    _loadMapStyle();
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
         // Map
-        GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: _kGooglePlex,
-          onMapCreated: (GoogleMapController controller) {
-            _controller.complete(controller);
-          },
-          onCameraMove: (position) {
-            setState(() {
-              movingCamera = true;
-            });
-          },
-          onCameraIdle: () {
-            setState(() {
-              movingCamera = false;
-            });
-          },
-          rotateGesturesEnabled: isSelectingSearch.value,
-          scrollGesturesEnabled: isSelectingSearch.value,
-          zoomGesturesEnabled: isSelectingSearch.value,
-          markers: markers,
-          polylines: polylines,
-          onTap: (position) {
-            if (lookingForStart) {
-              // Get location name
-              getLocationByCoordinates(position.latitude, position.longitude).then((location) {
-                if (location["name"].length <= 3) {
-                  startController.text = location["subname"].split(", ")[0];
+        ValueListenableBuilder(
+          valueListenable: mapStyle,
+          builder: (context, value, child) {
+            return GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _kGooglePlex,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+              onCameraMove: (position) {
+                setState(() {
+                  movingCamera = true;
+                });
+              },
+              onCameraIdle: () {
+                setState(() {
+                  movingCamera = false;
+                });
+              },
+              rotateGesturesEnabled: isSelectingSearch.value,
+              scrollGesturesEnabled: isSelectingSearch.value,
+              zoomGesturesEnabled: isSelectingSearch.value,
+              markers: markers,
+              polylines: polylines,
+              style: value,
+              onTap: (position) {
+                if (lookingForStart) {
+                  // Get location name
+                  getLocationByCoordinates(position.latitude, position.longitude).then((location) {
+                    if (location["name"].length <= 3) {
+                      startController.text = location["subname"].split(", ")[0];
+                    } else {
+                      startController.text = location["name"];
+                    }
+
+                    startLocation = {
+                      "lat": double.parse(location["lat"].toString()),
+                      "lon": double.parse(location["lon"].toString())
+                    };
+
+                    // Add marker to the map
+                    markers.remove(startMarker);
+                    startMarker = Marker(
+                      markerId: const MarkerId('start'),
+                      position: LatLng(startLocation["lat"], startLocation["lon"]),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                    );
+                    markers.add(startMarker!);
+
+                    // Draw the route
+                    drawRoute();
+
+                    setState(() {
+                      markers = markers;
+                      lookingForStart = false;
+                    });
+                  });
                 } else {
-                  startController.text = location["name"];
+                  // Get location name
+                  getLocationByCoordinates(position.latitude, position.longitude).then((location) {
+                    if (location["name"].length <= 3) {
+                      endController.text = location["subname"].split(", ")[0];
+                    } else {
+                      endController.text = location["name"];
+                    }
+
+                    endLocation = {
+                      "lat": double.parse(location["lat"].toString()),
+                      "lon": double.parse(location["lon"].toString())
+                    };
+
+                    // Add marker to the map
+                    markers.remove(endMarker);
+                    endMarker = Marker(
+                      markerId: const MarkerId('end'),
+                      position: LatLng(endLocation["lat"], endLocation["lon"]),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                    );
+                    markers.add(endMarker!);
+
+                    // Draw the route
+                    drawRoute();
+
+                    setState(() {
+                      markers = markers;
+                      lookingForStart = true;
+                    });
+                  });
                 }
 
-                startLocation = {
-                  "lat": double.parse(location["lat"].toString()),
-                  "lon": double.parse(location["lon"].toString())
-                };
-
-                // Add marker to the map
-                markers.remove(startMarker);
-                startMarker = Marker(
-                  markerId: const MarkerId('start'),
-                  position: LatLng(startLocation["lat"], startLocation["lon"]),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-                );
-                markers.add(startMarker!);
-
-                // Draw the route
-                drawRoute();
-
-                setState(() {
-                  markers = markers;
-                  lookingForStart = false;
-                });
-              });
-            } else {
-              // Get location name
-              getLocationByCoordinates(position.latitude, position.longitude).then((location) {
-                if (location["name"].length <= 3) {
-                  endController.text = location["subname"].split(", ")[0];
-                } else {
-                  endController.text = location["name"];
-                }
-
-                endLocation = {
-                  "lat": double.parse(location["lat"].toString()),
-                  "lon": double.parse(location["lon"].toString())
-                };
-
-                // Add marker to the map
-                markers.remove(endMarker);
-                endMarker = Marker(
-                  markerId: const MarkerId('end'),
-                  position: LatLng(endLocation["lat"], endLocation["lon"]),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-                );
-                markers.add(endMarker!);
-
-                // Draw the route
-                drawRoute();
-
-                setState(() {
-                  markers = markers;
-                  lookingForStart = true;
-                });
-              });
-            }
-
-            // Unfocus the text boxes
-            startSuggestionsController.close(retainFocus: false);
-            endSuggestionsController.close(retainFocus: false);
-          },
+                // Unfocus the text boxes
+                startSuggestionsController.close(retainFocus: false);
+                endSuggestionsController.close(retainFocus: false);
+              },
+            );
+          }
         ),
 
         AnimatedPositioned(
@@ -1033,8 +1051,8 @@ class _RoutePageState extends State<RoutePage> {
                           padding: const EdgeInsets.only(
                             top: 16.0,
                           ),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(50.0),
                               topRight: Radius.circular(50.0)
@@ -1056,7 +1074,7 @@ class _RoutePageState extends State<RoutePage> {
                                     },
                                     separatorBuilder: (context, index) {
                                       return Divider(
-                                        color: Colors.black.withOpacity(0.40),
+                                        color: (Theme.of(context).textTheme.displaySmall!.color ?? Colors.black).withOpacity(0.40),
                                       );
                                     },
                                     itemCount: snapshot2.data!.length,
@@ -1096,8 +1114,8 @@ class _RoutePageState extends State<RoutePage> {
                           padding: const EdgeInsets.only(
                             top: 16.0,
                           ),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(50.0),
                               topRight: Radius.circular(50.0)
@@ -1123,8 +1141,8 @@ class _RoutePageState extends State<RoutePage> {
                         padding: const EdgeInsets.only(
                           top: 16.0,
                         ),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(50.0),
                             topRight: Radius.circular(50.0)
@@ -1148,8 +1166,8 @@ class _RoutePageState extends State<RoutePage> {
                         padding: const EdgeInsets.only(
                           top: 16.0,
                         ),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(50.0),
                             topRight: Radius.circular(50.0)

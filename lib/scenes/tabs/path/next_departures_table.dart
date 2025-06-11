@@ -64,8 +64,6 @@ class _NextDeparturesTableState extends State<NextDeparturesTable> {
       Map<String, dynamic> line = departure['serviceJourney']['line'];
       List<dynamic> passingTimes = departure['serviceJourney']['passingTimes'];
 
-      print(passingTimes);
-
       // Check if stationId or toStationId is not present in passingTimes
       bool hasStationId = passingTimes.any((pt) => pt['quay']['id'] == widget.stationId);
       // Check if toStationId is present after stationId in passingTimes

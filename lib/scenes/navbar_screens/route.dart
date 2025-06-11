@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -549,18 +550,32 @@ class _RoutePageState extends State<RoutePage> {
                                     }
                                   }
                                 },
-                                onSelected: (value) {
+                                onSelected: (value) async {
                                   startController.text = value["name"];
 
                                   // Check if the suggestion is a GPS position
                                   if (value["type"] != null && value["type"] == "gps") {
+                                    // Loading pop
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }
+                                    );
+
                                     // Get the GPS position
-                                    getCurrentLocation().then((location) {
-                                      startLocation = {
-                                        "lat": location.latitude,
-                                        "lon": location.longitude
-                                      };
-                                    });
+                                    Position location = await getCurrentLocation();
+
+                                    startLocation = {
+                                      "lat": location.latitude,
+                                      "lon": location.longitude
+                                    };
+
+                                    // Close the loading pop
+                                    Navigator.of(context).pop();
                                   } else {
                                     startLocation = {
                                       "lat": double.parse(value["lat"].toString()),
@@ -765,18 +780,32 @@ class _RoutePageState extends State<RoutePage> {
                                     }
                                   }
                                 },
-                                onSelected: (value) {
+                                onSelected: (value) async {
                                   endController.text = value["name"];
 
                                   // Check if the suggestion is a GPS position
                                   if (value["type"] != null && value["type"] == "gps") {
+                                    // Loading pop
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }
+                                    );
+
                                     // Get the GPS position
-                                    getCurrentLocation().then((location) {
-                                      endLocation = {
-                                        "lat": location.latitude,
-                                        "lon": location.longitude
-                                      };
-                                    });
+                                    Position location = await getCurrentLocation();
+
+                                    endLocation = {
+                                      "lat": location.latitude,
+                                      "lon": location.longitude
+                                    };
+
+                                    // Close the loading pop
+                                    Navigator.of(context).pop();
                                   } else {
                                     endLocation = {
                                       "lat": double.parse(value["lat"].toString()),

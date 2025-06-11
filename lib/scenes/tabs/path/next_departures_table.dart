@@ -59,6 +59,7 @@ class _NextDeparturesTableState extends State<NextDeparturesTable> {
     for (var departure in data['quay']["estimatedCalls"]) {
       DateTime aimedDeparture = DateTime.parse(departure['aimedDepartureTime']).toLocal();
       DateTime estimatedDeparture = DateTime.parse(departure['expectedDepartureTime']).toLocal();
+
       bool realtime = departure['realtime'];
       Map<String, dynamic> line = departure['serviceJourney']['line'];
       List<dynamic> passingTimes = departure['serviceJourney']['passingTimes'];
@@ -93,32 +94,18 @@ class _NextDeparturesTableState extends State<NextDeparturesTable> {
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.2),
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              title: Row(
-                children: [
-                  Text(
-                    "${aimedDeparture.hour.toString().padLeft(2, '0')}:${aimedDeparture.minute.toString().padLeft(2, '0')}",
-                    style: GoogleFonts.nunito(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  /*const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
-                  const SizedBox(width: 8),
-                  Text(
-                    "${estimatedDeparture.hour.toString().padLeft(2, '0')}:${estimatedDeparture.minute.toString().padLeft(2, '0')} (${durationMinutes} min)",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),*/
-                ],
+              title: Text(
+                "${aimedDeparture.hour.toString().padLeft(2, '0')}:${aimedDeparture.minute.toString().padLeft(2, '0')}",
+                style: GoogleFonts.nunito(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
               subtitle: Text(
                 passingTimes.last['quay']['name'],
@@ -126,21 +113,41 @@ class _NextDeparturesTableState extends State<NextDeparturesTable> {
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
+                maxLines: 1,
               ),
-              trailing: Text(
-                "${aimedDeparture.hour.toString().padLeft(2, '0')}:${aimedDeparture.minute.toString().padLeft(2, '0')}",
-                style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (realtime)
+                    const Icon(
+                      Icons.rss_feed,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+
+                  if (realtime)
+                    Text(
+                      "${estimatedDeparture.hour.toString().padLeft(2, '0')}:${estimatedDeparture.minute.toString().padLeft(2, '0')}",
+                      style: GoogleFonts.nunito(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    )
+                  else
+                    Text(
+                      "${aimedDeparture.hour.toString().padLeft(2, '0')}:${aimedDeparture.minute.toString().padLeft(2, '0')}",
+                      style: GoogleFonts.nunito(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                ],
+              )
             ),
           ),
         ),
       );
     }
-
-    print("test3");
 
     _departuresRows.value = rows;
   }

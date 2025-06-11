@@ -73,7 +73,7 @@ class _PathMapState extends State<PathMap> {
       );
 
       if (leg["route"] != null) {
-        transportIcons.add(await getTransportIconFromPath(leg["route"], context, false));
+        transportIcons.add(await getTransportIconFromPath(leg["route"], context, true));
       } else {
         transportIcons.add(
           Row(

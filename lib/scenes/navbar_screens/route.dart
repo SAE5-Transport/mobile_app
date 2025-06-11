@@ -95,7 +95,7 @@ class _RoutePageState extends State<RoutePage> {
       for (var leg in path["legs"]) {
         // Show lines icons
         if (leg["route"] != null) {
-          linesIcons.add(await getTransportIconFromPath(leg["route"], context, false));
+          linesIcons.add(await getTransportIconFromPath(leg["route"], context, true));
 
           // Add a separator
           linesIcons.add(

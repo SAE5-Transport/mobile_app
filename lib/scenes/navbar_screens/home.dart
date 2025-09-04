@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:mobile_app/scenes/main_screen.dart';
@@ -61,6 +62,15 @@ class _HomeState extends State<Home> {
     }
   }
 
+  ValueNotifier<String> mapStyle = ValueNotifier<String>('');
+  void _loadMapStyle() async {
+    if (Theme.of(context).brightness == Brightness.dark) {
+      mapStyle.value = await rootBundle.loadString('assets/map_styles/dark.json');
+    } else {
+      mapStyle.value = await rootBundle.loadString('assets/map_styles/light.json');
+    }
+  }
+
   Map<int, IconData> iconDataMap = {
     0xe88a: Icons.home,
     0xe84f: Icons.apartment,
@@ -100,29 +110,38 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    _loadMapStyle();
+
     return Scaffold(
       body: Stack(
         children: [
           // Carte Google Maps
-          GoogleMap(
-            mapType: MapType.normal,
-            initialCameraPosition: _currentLocation != null
-                ? CameraPosition(
-                    target: LatLng(
-                      _currentLocation!.latitude ?? 0.0,
-                      _currentLocation!.longitude ?? 0.0,
-                    ),
-                    zoom: 14.4746,
-                  )
-                : const CameraPosition(
-                    target: LatLng(48.866667, 2.333333),
-                    zoom: 14.4746,
-                  ),
-            myLocationEnabled: true,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
+          ValueListenableBuilder(
+            valueListenable: mapStyle,
+            builder: (context, style, child) {
+              return GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: _currentLocation != null
+                    ? CameraPosition(
+                        target: LatLng(
+                          _currentLocation!.latitude ?? 0.0,
+                          _currentLocation!.longitude ?? 0.0,
+                        ),
+                        zoom: 14.4746,
+                      )
+                    : const CameraPosition(
+                        target: LatLng(48.866667, 2.333333),
+                        zoom: 14.4746,
+                      ),
+                myLocationEnabled: true,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+                style: style,
+              );
             },
           ),
+
           // Barre d'options en bas
           Positioned(
             bottom: 20,

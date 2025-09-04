@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_app/scenes/tabs/path/next_departures_table.dart';
 import 'package:mobile_app/utils/assets.dart';
 import 'package:mobile_app/utils/functions.dart';
 
@@ -75,10 +76,10 @@ class _TransportStepState extends State<TransportStep> {
     widgets.add(
       Row(
         children: [
-          const Icon(
+          Icon(
             Icons.location_pin,
             size: 40,
-            color: Colors.black
+            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
           ),
 
           const SizedBox(width: 8),
@@ -90,17 +91,18 @@ class _TransportStepState extends State<TransportStep> {
                 "Départ",
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black
+                  // Take the light or dark theme color
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 ),
               ),
 
               Text(
                 // Show hour & end name
-                "${DateTime.parse(widget.pathData["start"]).hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["start"]).minute.toString().padLeft(2, '0')} - ${widget.startName}",
+                "${DateTime.parse(widget.pathData["start"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["start"]).toLocal().minute.toString().padLeft(2, '0')} - ${widget.startName}",
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  color: Colors.black
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 ),
               )
             ],
@@ -111,13 +113,13 @@ class _TransportStepState extends State<TransportStep> {
 
     int legIndex = 0;
     for (var leg in widget.pathData['legs']) {
-      DateTime scheduledStart = DateTime.parse(leg["start"]["scheduledTime"]);
-      DateTime scheduledEnd = DateTime.parse(leg["end"]["scheduledTime"]);
+      DateTime scheduledStart = DateTime.parse(leg["start"]["scheduledTime"]).toLocal();
+      DateTime scheduledEnd = DateTime.parse(leg["end"]["scheduledTime"]).toLocal();
       DateTime? estimatedStart = (leg["start"]["estimated"] != null)
-          ? DateTime.parse(leg["start"]["estimated"]['time'])
+          ? DateTime.parse(leg["start"]["estimated"]['time']).toLocal()
           : null;
       DateTime? estimatedEnd = (leg["end"]["estimated"] != null)
-          ? DateTime.parse(leg["end"]["estimated"]['time'])
+          ? DateTime.parse(leg["end"]["estimated"]['time']).toLocal()
           : null;
 
       Widget? lineDrawing;
@@ -130,7 +132,7 @@ class _TransportStepState extends State<TransportStep> {
           style: GoogleFonts.nunito(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: Colors.black
+            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
           ),
         );
       }
@@ -155,7 +157,8 @@ class _TransportStepState extends State<TransportStep> {
                         Text(
                           "Correspondance",
                           style: GoogleFonts.nunito(
-                            fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                           ),
                         ),
                       ],
@@ -176,12 +179,12 @@ class _TransportStepState extends State<TransportStep> {
                 ),
               ),
               Container(
-                color: Colors.grey[300] ?? Colors.grey,
+                color: Theme.of(context).colorScheme.surface,
                 margin: const EdgeInsets.symmetric(vertical: 4),
-                child: const Icon(
+                child: Icon(
                   Icons.directions_walk,
                   size: 40,
-                  color: Colors.black
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 ),
               ),
               Expanded(
@@ -210,7 +213,8 @@ class _TransportStepState extends State<TransportStep> {
                         Text(
                           "Marche",
                           style: GoogleFonts.nunito(
-                            fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -218,7 +222,8 @@ class _TransportStepState extends State<TransportStep> {
                           "${convertSecondsToMinutes(double.parse(leg['duration'].toString())).floor()} minutes",
                           style: GoogleFonts.nunito(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                           ),
                         )
                       ],
@@ -239,12 +244,12 @@ class _TransportStepState extends State<TransportStep> {
                 ),
               ),
               Container(
-                color: Colors.grey[300] ?? Colors.grey,
+                color: Theme.of(context).colorScheme.surface,
                 margin: const EdgeInsets.symmetric(vertical: 4),
-                child: const Icon(
+                child: Icon(
                   Icons.directions_walk,
                   size: 40,
-                  color: Colors.black
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 ),
               ),
               Expanded(
@@ -267,6 +272,7 @@ class _TransportStepState extends State<TransportStep> {
             style: GoogleFonts.nunito(
               fontWeight: FontWeight.w600,
               fontSize: 20,
+              color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
             ),
           ),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
@@ -288,7 +294,9 @@ class _TransportStepState extends State<TransportStep> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       stop["name"] ?? "",
-                      style: GoogleFonts.nunito(),
+                      style: GoogleFonts.nunito(
+                        color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black,
+                      ),
                     ),
                   ),
                 );
@@ -331,6 +339,7 @@ class _TransportStepState extends State<TransportStep> {
                               style: GoogleFonts.nunito(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
+                                color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                               ),
                             ),
                           ),
@@ -341,8 +350,17 @@ class _TransportStepState extends State<TransportStep> {
                         "Vers ${leg["to"]["name"]}",
                         style: GoogleFonts.nunito(
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                         ),
                       ),
+
+                      NextDeparturesTable(
+                        stationId: leg["from"]["stop"]["gtfsId"],
+                        startTime: scheduledStart,
+                        toStationId: leg["to"]["stop"]["gtfsId"],
+                        lineId: leg["route"]["gtfsId"],
+                      ),
+                      
                       // Dropdown for stops
                       if (leg["intermediateStops"] != null && leg["intermediateStops"] is List && leg["intermediateStops"].isNotEmpty)
                         Theme(
@@ -398,10 +416,10 @@ class _TransportStepState extends State<TransportStep> {
     widgets.add(
       Row(
         children: [
-          const Icon(
+          Icon(
             Icons.location_pin,
             size: 40,
-            color: Colors.black
+            color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
           ),
 
           const SizedBox(width: 8),
@@ -413,17 +431,17 @@ class _TransportStepState extends State<TransportStep> {
                 "Arrivée",
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 ),
               ),
 
               Text(
                 // Show hour & end name
-                "${DateTime.parse(widget.pathData["end"]).hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["end"]).minute.toString().padLeft(2, '0')} - ${widget.endName}",
+                "${DateTime.parse(widget.pathData["end"]).toLocal().hour.toString().padLeft(2, '0')}:${DateTime.parse(widget.pathData["end"]).toLocal().minute.toString().padLeft(2, '0')} - ${widget.endName}",
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  color: Colors.black
+                  color: Theme.of(context).textTheme.displaySmall!.color ?? Colors.black
                 ),
               )
             ],

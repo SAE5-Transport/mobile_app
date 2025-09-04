@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/scenes/navbar_screens/account_parameters.dart';
+import 'package:mobile_app/scenes/navbar_screens/follow.dart';
 import 'package:mobile_app/scenes/navbar_screens/home.dart';
 import 'package:mobile_app/scenes/navbar_screens/route.dart';
+import 'package:mobile_app/scenes/navbar_screens/ticket.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
@@ -26,10 +28,10 @@ class MainScreenState extends State<MainScreen> {
         _currentScreen.value = const RoutePage();
         break;
       case 2:
-        _currentScreen.value = Container();
+        _currentScreen.value = const TicketPage();
         break;
       case 3:
-        _currentScreen.value = Container();
+        _currentScreen.value = const FollowPage();
         break;
       case 4:
         _currentScreen.value = const AccountParameters();
